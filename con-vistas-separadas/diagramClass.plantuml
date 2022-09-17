@@ -1,0 +1,56 @@
+@startuml
+Connect4View ..> YesNoDialogView
+Connect4View ..> GameView
+Connect4View : + play()
+
+YesNoDialogView : - question
+YesNoDialogView : - answer
+YesNoDialogView : + read()
+YesNoDialogView : + isAffirmative()
+YesNoDialogView : + isNegative()
+
+GameView *--> Game
+GameView *--> BoardView
+GameView *--> Player
+GameView : + play()
+GameView : + showBoard
+GameView : + showFinalMsg
+
+Game : + MAX_TOKENS
+Game ..> BoardView
+Game : + isWinner(token, grid)
+Game : + isTied(numberOfRounds)
+
+BoardView ..> Token
+BoardView ..> Board
+BoardView : + showBoard()
+BoardView : + updateGrid()
+BoardView : + getToken()
+BoardView : + getGrid()
+BoardView : + isConnectedInHorizontal()
+BoardView : + isConnectedInVertical()
+BoardView : + isConnectedInDiagonal()
+BoardView : + readColumn()
+
+Board : + MIN_ROWS
+Board : + MIN_COLUMNS
+Board : + MAX_ROWS
+Board : + MAX_COLUMNS
+Board : + TOKENS_CONNECTED_FOR_WIN
+Board : + grid
+Board : + calculateRow(grid, col)
+BoardView : + isConnectedInVertical(token, grid)
+BoardView : + isConnectedInHorizontal(token, grid)
+BoardView : + isConnectedInDiagonal(token, grid)
+
+Token : +  row
+Token : +  col
+Token : +  owner
+
+Player : + numberOfRounds
+Player : + player1
+Player : + player2()
+Player : + getTurn()
+Player : + changeTurn()
+
+@enduml

@@ -1,14 +1,13 @@
 const { Console } = require("console-mpds");
 const console = new Console();
 
-let { Player } = require('../model/Player');
-let { BoardView } = require('./BoardView');
+let { Game } = require('../model/Game');
+let { Token } = require('../model/Token');
 
 class GameView {
   
     constructor() {
-        this.boardView = new BoardView();
-        this.player = new Player();
+        this.game = new Game();
     }
 
     play() {
@@ -16,23 +15,52 @@ class GameView {
         let gameFinished;
         do {
             this.showBoard();
-            this.boardView.readToken(this.player.getTurn());
-            gameFinished = this.boardView.isWinner() || 
-                this.boardView.isTied(this.player.numberOfRounds);
+            this.readToken();
+            gameFinished = this.isWinner() || this.isTied();
             if (gameFinished) {
                 this.showBoard();
-                this.showFinalMsg(this.player.numberOfRounds, this.player.getTurn());
+                this.showFinalMsg();
             }
-            this.player.changeTurn();
         } while (!gameFinished);
     }
 
     showBoard() {
-        this.boardView.showBoard();
+        for (let row = 0; row < this.game.grid.length; row++) {
+            console.writeln(this.game.grid[row]);
+        }
     }
 
-    showFinalMsg(numberOfRounds, lastActivePlayer) {
-        this.boardView.isTied(numberOfRounds) ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${lastActivePlayer}`);
+    readToken() {
+        let token = {player: this.game.getPlayer()};
+        let correctColumn = true;
+        do {
+            console.writeln(`--------------------------`);
+            token.col = console.readNumber(`Player ${token.player} Select column between (1 - 7)`);
+            token.row = this.game.calculateRow(token.col);
+            if (1 > token.col || token.col > 7) {
+                console.writeln("Remember columns between 1 and 7");
+                correctColumn = false;
+            } else if (token.row === undefined) {
+                console.writeln("This column is full");
+                correctColumn = false;
+            }
+        } while (!correctColumn);
+
+        this.game.addToken(new Token(token.row, token.col, token.player));
+    }
+
+    isWinner() {
+        return this.game.isConnectedInHorizontal()
+            || this.game.isConnectedInVertical()
+            || this.game.isConnectedInDiagonal();
+    }
+
+    isTied() {
+        return this.game.isTied();
+    }
+
+    showFinalMsg() {
+        this.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${this.game.getPlayer()}`);
     }
 }
 

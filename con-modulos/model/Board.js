@@ -1,9 +1,10 @@
-let { Token } = require('../model/Token');
+const { Turn } = require('./Turn');
 
 class Board {
 
     currentToken = null;
-    MAX_TOKENS = 42;
+    turn = new Turn();
+    MAX_TURNS = 42;
     MIN_ROWS = 1;
     MIN_COLUMNS = 1;
     MAX_ROWS = 6;
@@ -17,9 +18,14 @@ class Board {
     ["5", "_", "_", "_", "_", "_", "_", "_"],
     ["6", "_", "_", "_", "_", "_", "_", "_"]];
 
+    getPlayer() {
+        return this.turn.getPlayer();
+    }
+
     addToken(token) {
         this.currentToken = token;
         this.grid[token.row][token.col] = token.player;
+        this.turn.changeTurn();
     }
 
     calculateRow(col) {
@@ -81,6 +87,10 @@ class Board {
                 countDiagonalLeft = 0;
             }
         }
+    }
+
+    isTied() {
+        return this.turn.getTurn() === this.MAX_TURNS - 1;
     }
 }
 

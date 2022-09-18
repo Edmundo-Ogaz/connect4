@@ -3,7 +3,7 @@ let { YesNoDialogView } = require('./view/YesNoDialogView');
 
 class Connect4 {
     
-    static play() {
+    static init() {
         const continueDialogView = new YesNoDialogView(`¿Quieres jugar otra partida? `);
         do {
             new GameView().play();

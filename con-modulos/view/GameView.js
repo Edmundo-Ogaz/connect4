@@ -16,9 +16,8 @@ class GameView {
         let gameFinished;
         do {
             this.showBoard();
-            let token = this.boardView.getToken(this.player.getTurn());
-            //this.boardView.updateGrid(token);
-            gameFinished = this.boardView.isWinner(token) || 
+            this.boardView.readToken(this.player.getTurn());
+            gameFinished = this.boardView.isWinner() || 
                 this.boardView.isTied(this.player.numberOfRounds);
             if (gameFinished) {
                 this.showBoard();

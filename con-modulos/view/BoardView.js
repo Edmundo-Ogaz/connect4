@@ -9,7 +9,6 @@ class BoardView {
     MAX_TOKENS = 42;
 
   constructor() {
-      this.token = new Token();
       this.board = new Board();
   }
 
@@ -18,23 +17,6 @@ class BoardView {
             console.writeln(this.board.grid[row]);
         }
     }
-
-    getToken(player) {
-        this.readColumn(player);
-        return this.token;
-    }
-
-    // isConnectedInHorizontal(token) {
-    //     return this.board.isConnectedInHorizontal(token);
-    // }
-
-    // isConnectedInVertical(token) {
-    //     return this.board.isConnectedInVertical(token);
-    // }
-
-    // isConnectedInDiagonal(token) {
-    //     return this.board.isConnectedInDiagonal(token);
-    // }
 
     isWinner() {
         return this.board.isConnectedInHorizontal()
@@ -46,7 +28,7 @@ class BoardView {
         return numberOfRounds === this.MAX_TOKENS - 1;
     }
     
-    readColumn(player) {
+    readToken(player) {
         let correctColumn;
         let col;
         let row;
@@ -64,11 +46,7 @@ class BoardView {
             }
         } while (!correctColumn);
 
-        this.token.owner = player;
-        this.token.col = col;
-        this.token.row = row;
-
-        this.board.grid[this.token.row][this.token.col] = player;
+        this.board.grid[row][col] = player;
         this.board.setCurrentToken(new Token(row, col, player));
     }
 }

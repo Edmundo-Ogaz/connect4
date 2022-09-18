@@ -1,7 +1,10 @@
 @startuml
-Connect4View ..> YesNoDialogView
-Connect4View ..> GameView
-Connect4View : + init()
+Connect4 ..> YesNoDialogView
+Connect4 ..> GameView
+Connect4 : + init()
+Connect4 : + askGameMode()
+Connect4 ..> PlayerView
+Connect4 ..> CPU
 
 YesNoDialogView : - question
 YesNoDialogView : - answer
@@ -9,11 +12,16 @@ YesNoDialogView : + read()
 YesNoDialogView : + isAffirmative()
 YesNoDialogView : + isNegative()
 
+CPU : + readToken()
+CPU ..>Token
+
+PlayerView : + readToken()
+PlayerView ..>Token
+
+GameView : - players
 GameView *--> Game
-GameView ..>Token
 GameView : + play()
 GameView : + showBoard()
-GameView : + readToken()
 GameView : + showFinalMsg()
 
 Game : - MAX_TURNS

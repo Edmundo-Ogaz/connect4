@@ -18,14 +18,21 @@ class Game {
         return this.board.grid[row];
     }
 
+    getTurn() {
+        return this.turn.getTurn();
+    }
+
     getPlayer() {
         return this.turn.getPlayer();
+    }
+
+    changeTurn() {
+        this.turn.changeTurn();
     }
 
     addToken(token) {
         this.currentToken = token;
         this.board.grid[token.row][token.col] = token.player;
-        this.turn.changeTurn();
     }
 
     calculateRow(col) {
@@ -39,7 +46,7 @@ class Game {
     }
 
     isTied() {
-        return this.turn.getTurn() === this.MAX_TURNS - 1;
+        return this.turn.getTurns() === this.MAX_TURNS - 1;
     }
 }
 

@@ -10,8 +10,12 @@ class Turn {
         return this.numberOfTurns % 2 === 0 ? this.PLAYER_1 : this.PLAYER_2;
     }
 
-    getTurn() {
+    getTurns() {
         return this.numberOfTurns;
+    }
+
+    getTurn() {
+        return this.numberOfTurns % 2 === 0 ? 0 : 1;
     }
     
     changeTurn() {

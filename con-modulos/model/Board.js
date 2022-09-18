@@ -3,6 +3,7 @@ let { Token } = require('../model/Token');
 class Board {
 
     currentToken = null;
+    MAX_TOKENS = 42;
     MIN_ROWS = 1;
     MIN_COLUMNS = 1;
     MAX_ROWS = 6;
@@ -16,8 +17,9 @@ class Board {
     ["5", "_", "_", "_", "_", "_", "_", "_"],
     ["6", "_", "_", "_", "_", "_", "_", "_"]];
 
-    setCurrentToken(token) {
+    addToken(token) {
         this.currentToken = token;
+        this.grid[token.row][token.col] = token.player;
     }
 
     calculateRow(col) {
@@ -31,7 +33,7 @@ class Board {
     isConnectedInVertical() {
         let countVertical = 0;
         for (let row =     this.currentToken.row; row <= this.MAX_ROWS; row++) {
-            if (this.grid[row][this.currentToken.col] === this.currentToken.owner) {
+            if (this.grid[row][this.currentToken.col] === this.currentToken.player) {
                 countVertical++;
                 if (countVertical === this.TOKENS_CONNECTED_FOR_WIN) {
                     return true;
@@ -45,7 +47,7 @@ class Board {
     isConnectedInHorizontal() {
         let countHorizontal = 0;
         for (let col = this.MIN_COLUMNS; col <= this.MAX_COLUMNS; col++) {
-            if (this.grid[this.currentToken.row][col - 1] === this.currentToken.owner) {
+            if (this.grid[this.currentToken.row][col - 1] === this.currentToken.player) {
                 countHorizontal++;
                 if (countHorizontal === this.TOKENS_CONNECTED_FOR_WIN) {
                     return true;
@@ -59,7 +61,7 @@ class Board {
     isConnectedInDiagonal() {
         let countDiagonalRight = 0;
         for (let row = this.currentToken.row, col = this.currentToken.col; row <= this.MAX_ROWS & col >= this.MIN_COLUMNS; row++, col--) {
-            if (this.grid[row][col] === this.currentToken.owner) {
+            if (this.grid[row][col] === this.currentToken.player) {
                 countDiagonalRight++;
                 if (countDiagonalRight === this.TOKENS_CONNECTED_FOR_WIN) {
                     return true;
@@ -70,7 +72,7 @@ class Board {
         }
         let countDiagonalLeft = 0;
         for (let row = this.currentToken.row, col = this.currentToken.col; row <= this.MAX_ROWS && col <= this.MAX_COLUMNS; row++, col++) {
-            if (this.grid[row][col] === this.currentToken.owner) {
+            if (this.grid[row][col] === this.currentToken.player) {
                 countDiagonalLeft++;
                 if (countDiagonalLeft === this.TOKENS_CONNECTED_FOR_WIN) {
                     return true;

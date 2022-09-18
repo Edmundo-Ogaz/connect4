@@ -2,12 +2,12 @@ class Token {
 
     row = undefined;
     col = undefined;
-    owner = "";
+    player = "";
 
-    constructor(row, col, owner) {
+    constructor(row, col, player) {
         this.row = row;
         this.col = col;
-        this.owner = owner;
+        this.player = player;
     }
 }
 

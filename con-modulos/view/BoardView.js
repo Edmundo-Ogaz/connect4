@@ -6,8 +6,6 @@ let { Board } = require('../model/Board');
 
 class BoardView {
 
-    MAX_TOKENS = 42;
-
   constructor() {
       this.board = new Board();
   }
@@ -25,16 +23,15 @@ class BoardView {
     }
 
     isTied(numberOfRounds) {
-        return numberOfRounds === this.MAX_TOKENS - 1;
+        return numberOfRounds === this.board.MAX_TOKENS - 1;
     }
     
     readToken(player) {
-        let correctColumn;
         let col;
         let row;
+        let correctColumn = true;
         do {
             console.writeln(`--------------------------`);
-            correctColumn = true;
             col = console.readNumber(`Player ${player} Select column between (1 - 7)`);
             row = this.board.calculateRow(col);
             if (1 > col || col > 7) {
@@ -46,8 +43,7 @@ class BoardView {
             }
         } while (!correctColumn);
 
-        this.board.grid[row][col] = player;
-        this.board.setCurrentToken(new Token(row, col, player));
+        this.board.addToken(new Token(row, col, player));
     }
 }
 

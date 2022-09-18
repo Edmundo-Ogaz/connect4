@@ -16,17 +16,14 @@ class GameView {
         do {
             this.showBoard();
             this.readToken();
-            gameFinished = this.isWinner() || this.isTied();
-            if (gameFinished) {
-                this.showBoard();
-                this.showFinalMsg();
-            }
+            gameFinished = this.game.isWinner() || this.game.isTied();
         } while (!gameFinished);
+        this.showFinalMsg();
     }
 
     showBoard() {
-        for (let row = 0; row < this.game.grid.length; row++) {
-            console.writeln(this.game.grid[row]);
+        for (let row = 0; row < this.game.getBoardLength(); row++) {
+            console.writeln(this.game.getBoardRow(row));
         }
     }
 
@@ -46,21 +43,12 @@ class GameView {
             }
         } while (!correctColumn);
 
-        this.game.addToken(new Token(token.row, token.col, token.player));
-    }
-
-    isWinner() {
-        return this.game.isConnectedInHorizontal()
-            || this.game.isConnectedInVertical()
-            || this.game.isConnectedInDiagonal();
-    }
-
-    isTied() {
-        return this.game.isTied();
+        this.game.addToken(token);
     }
 
     showFinalMsg() {
-        this.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${this.game.getPlayer()}`);
+        this.showBoard();
+        this.game.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${this.game.getPlayer()}`);
     }
 }
 

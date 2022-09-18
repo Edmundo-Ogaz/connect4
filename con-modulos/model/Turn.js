@@ -1,11 +1,13 @@
 class Turn {
     
-    numberOfTurns = 0;
-    player1 = "X";
-    player2 = "O";
+    constructor() {
+        this.numberOfTurns = 0;
+        this.PLAYER_1 = "X";
+        this.PLAYER_2 = "O";
+    }
 
     getPlayer() {
-        return this.numberOfTurns % 2 === 0 ? this.player1 : this.player2;
+        return this.numberOfTurns % 2 === 0 ? this.PLAYER_1 : this.PLAYER_2;
     }
 
     getTurn() {

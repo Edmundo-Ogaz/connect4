@@ -28,7 +28,7 @@ class GameView {
     }
 
     readToken() {
-        let token = {player: this.game.getPlayer()};
+        let token = new Token(this.game.getPlayer());
         let correctColumn = true;
         do {
             console.writeln(`--------------------------`);

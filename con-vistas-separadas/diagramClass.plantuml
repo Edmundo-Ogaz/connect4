@@ -1,7 +1,7 @@
 @startuml
 Connect4View ..> YesNoDialogView
 Connect4View ..> GameView
-Connect4View : + play()
+Connect4View : + init()
 
 YesNoDialogView : - question
 YesNoDialogView : - answer
@@ -10,47 +10,43 @@ YesNoDialogView : + isAffirmative()
 YesNoDialogView : + isNegative()
 
 GameView *--> Game
-GameView *--> BoardView
-GameView *--> Player
+GameView ..>Token
 GameView : + play()
-GameView : + showBoard
-GameView : + showFinalMsg
+GameView : + showBoard()
+GameView : + readToken()
+GameView : + showFinalMsg()
 
-Game : + MAX_TOKENS
-Game ..> BoardView
-Game : + isWinner(token, grid)
-Game : + isTied(numberOfRounds)
+Game : - MAX_TURNS
+Game : - currentToken
+Game *--> Board
+Game *--> Turn
+Game : + getBoardLength()
+Game : + getBoardRow(row)
+Game : + getPlayer()
+Game : + addToken(token)
+Game : + calculateRow(col)
+Game : + isWinner()
+Game : + isTied()
 
-BoardView ..> Token
-BoardView ..> Board
-BoardView : + showBoard()
-BoardView : + updateGrid()
-BoardView : + getToken()
-BoardView : + getGrid()
-BoardView : + isConnectedInHorizontal()
-BoardView : + isConnectedInVertical()
-BoardView : + isConnectedInDiagonal()
-BoardView : + readColumn()
+Board : - MIN_COLUMNS
+Board : - MAX_ROWS
+Board : - MAX_COLUMNS
+Board : - TOKENS_CONNECTED_FOR_WIN
+Board : - grid
+Board : + calculateRow(col)
+Board : + isConnectedInVertical(token)
+Board : + isConnectedInHorizontal(token)
+Board : + isConnectedInDiagonal(token)
 
-Board : + MIN_ROWS
-Board : + MIN_COLUMNS
-Board : + MAX_ROWS
-Board : + MAX_COLUMNS
-Board : + TOKENS_CONNECTED_FOR_WIN
-Board : + grid
-Board : + calculateRow(grid, col)
-BoardView : + isConnectedInVertical(token, grid)
-BoardView : + isConnectedInHorizontal(token, grid)
-BoardView : + isConnectedInDiagonal(token, grid)
+Turn : - numberOfRounds
+Turn : - PLAYER_1
+Turn : - PLAYER_2
+Turn : + getPlayer()
+Turn : + getTurn()
+Turn : + changeTurn()
 
-Token : +  row
-Token : +  col
-Token : +  owner
-
-Player : + numberOfRounds
-Player : + player1
-Player : + player2()
-Player : + getTurn()
-Player : + changeTurn()
+Token : + row
+Token : + col
+Token : + player
 
 @enduml

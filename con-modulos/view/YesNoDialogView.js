@@ -3,31 +3,31 @@ const console = new Console();
 
 class YesNoDialogView {
 
-    question;
-    answer;
+  question;
+  answer;
 
-    constructor(question) {
-        this.question = question;
-    }
-    
-    read() {
-        let error;
-        do {
-            this.answer = console.readString(this.question);
-            error = !this.isAffirmative() && !this.isNegative();
-            if (error) {
-                console.writeln(`Por favor, responda "si" o "no"`);
-            }
-        } while (error);
-    }
+  constructor(question) {
+    this.question = question;
+  }
 
-    isAffirmative() {
-        return this.answer === `si`;
-    }
+  read() {
+    let error;
+    do {
+      this.answer = console.readString(this.question);
+      error = !this.isAffirmative() && !this.isNegative();
+      if (error) {
+        console.writeln(`Por favor, responda "si" o "no"`);
+      }
+    } while (error);
+  }
 
-    isNegative() {
-        return this.answer === `no`;
-    }
+  isAffirmative() {
+    return this.answer === `si`;
+  }
+
+  isNegative() {
+    return this.answer === `no`;
+  }
 }
 
 module.exports.YesNoDialogView = YesNoDialogView;

@@ -8,8 +8,8 @@ function initConnect4View() {
         init() {
             const continueDialogView = initYesNoDialogView(`Do you want to continue? (yes/no)`);
             do {
-                const players = askGameMode();
-                initGameView(players).play();
+                const gameMode = askGameMode();
+                initGameView(gameMode).play();
                 continueDialogView.read();
             } while (continueDialogView.isAffirmative());
             
@@ -92,7 +92,7 @@ function initYesNoDialogView(question) {
     };
 }
 
-function initGameView(players) {
+function initGameView(gameMode) {
     let game = initGame();
     return {
         play() {
@@ -100,7 +100,7 @@ function initGameView(players) {
             let gameFinished;
             do {
                 showBoard();
-                const token = players[game.getTurn()](game);
+                const token = gameMode[game.getTurn()](game);
                 game.addToken(token);
                 gameFinished = game.isWinner() || game.isTied();
                 if (gameFinished) {

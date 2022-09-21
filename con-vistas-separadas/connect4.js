@@ -30,7 +30,7 @@ function initConnect4View() {
         } while (error);
 
         function generateRandomPosition(game) {
-          let token = initToken(game.getPlayer());
+          let token = {player: game.getPlayer()};
           let correctColumn = true;
           do {
             console.writeln(`--------------------------`);
@@ -47,7 +47,7 @@ function initConnect4View() {
         }
 
         function askPosition(game) {
-          let token = initToken(game.getPlayer());
+          let token = {player: game.getPlayer()};
           let correctColumn = true;
           do {
             console.writeln(`--------------------------`);
@@ -92,7 +92,7 @@ function initYesNoDialogView(question) {
   };
 }
 
-function initGameView(gameMode) {
+function initGameView(players) {
   let game = initGame();
   return {
     play() {
@@ -100,7 +100,7 @@ function initGameView(gameMode) {
       let gameFinished;
       do {
         showBoard();
-        const token = gameMode[game.getTurn()](game);
+        const token = players[game.getTurn()](game);
         game.addToken(token);
         gameFinished = game.isWinner() || game.isTied();
         if (gameFinished) {
@@ -128,6 +128,7 @@ function initGame() {
   let turn = initTurn();
   let board = initBoard();
   let currentToken = null;
+
   return {
     getBoardLength() {
       return board.getLength();
@@ -177,7 +178,6 @@ function initBoard() {
   ["6", "_", "_", "_", "_", "_", "_", "_"]];
 
   return {
-
     getLength() {
       return grid.length;
     },
@@ -266,13 +266,5 @@ function initTurn() {
     changeTurn() {
       numberOfTurns++;
     }
-  }
-}
-
-function initToken(player) {
-  return {
-    player: player,
-    row: undefined,
-    col: undefined
   }
 }

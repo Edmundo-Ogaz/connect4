@@ -22,12 +22,12 @@ function initGameMode() {
   [PlayerView(), PlayerView()]];
   let error = false;
   do {
-    let response = console.readNumber(`Dime el modo de juego:
+    let response = console.readNumber(`Tell me the game mode:
               (0) Demo-Game, (1) Player Vs CPU, (2) Player Vs Player`);
     if (response === 0 || response === 1 || response === 2) {
       return gameModes[response];
     } else {
-      console.writeln(`El modo de juego ${response} no existe`);
+      console.writeln(`This game mode ${response} doesn´t exist`);
       error = true;
     }
   } while (error);
@@ -63,6 +63,7 @@ function PlayerView() {
         console.writeln(`--------------------------`);
         coordinate.col = console.readNumber(`Player ${game.getPlayer()} Select column between (1 - 7)`);
         coordinate.row = game.calculateRow(coordinate.col);
+        console.writeln(coordinate.col);
         if (1 > coordinate.col || coordinate.col > 7) {
           console.writeln("Remember columns between 1 and 7");
           correctColumn = false;
@@ -148,9 +149,9 @@ function initGame() {
     changeTurn() {
       turn.changeTurn();
     },
-    addToken(token) {
-      currentToken = token;
-      board.addToken(token);
+    addToken(coordinate) {
+      currentToken = coordinate;
+      board.addToken(coordinate);
     },
     calculateRow(col) {
       return board.calculateRow(col);
@@ -180,6 +181,19 @@ function initBoard() {
   ["5", "_", "_", "_", "_", "_", "_", "_"],
   ["6", "_", "_", "_", "_", "_", "_", "_"]];
 
+
+  function isConnect4(connect4, {row, col, player}) {
+    console.writeln(JSON.stringify(connect4));
+    if (grid[row][col] === player) {
+      connect4.counter++;
+      if (connect4.counter === TOKENS_CONNECTED_FOR_WIN) {
+        return true;
+      }
+    } else {
+      connect4.counter = 0;
+    }
+  }
+
   return {
     getLength() {
       return grid.length;
@@ -194,56 +208,36 @@ function initBoard() {
         }
       }
     },
-    addToken(token) {
-      grid[token.row][token.col] = token.player;
+    addToken(coordinate) {
+      grid[coordinate.row][coordinate.col] = coordinate.player;
     },
-    isConnectedInVertical(token) {
-      let countVertical = 0;
-      for (let row = token.row; row <= MAX_ROWS; row++) {
-        if (grid[row][token.col] === token.player) {
-          countVertical++;
-          if (countVertical === TOKENS_CONNECTED_FOR_WIN) {
-            return true;
-          }
-        } else {
-          countVertical = 0;
+    isConnectedInVertical(coordinate) {
+      let countVertical = {counter: 0};
+      for (let row = coordinate.row; row <= MAX_ROWS; row++) {
+        if (isConnect4(countVertical, {...coordinate, row})) {
+          return true;
         }
       }
     },
-    isConnectedInHorizontal(token) {
-      let countHorizontal = 0;
+    isConnectedInHorizontal(coordinate) {
+      let countHorizontal = {counter: 0};
       for (let col = MIN_COLUMNS; col <= MAX_COLUMNS; col++) {
-        if (grid[token.row][col] === token.player) {
-          countHorizontal++;
-          if (countHorizontal === TOKENS_CONNECTED_FOR_WIN) {
-            return true;
-          }
-        } else {
-          countHorizontal = 0;
+        if (isConnect4(countHorizontal, {...coordinate, col})) {
+          return true;
         }
       }
     },
-    isConnectedInDiagonal(token) {
-      let countDiagonalRight = 0;
-      for (let row = token.row, col = token.col; row <= MAX_ROWS & col >= MIN_COLUMNS; row++, col--) {
-        if (grid[row][col] === token.player) {
-          countDiagonalRight++;
-          if (countDiagonalRight === TOKENS_CONNECTED_FOR_WIN) {
-            return true;
-          }
-        } else {
-          countDiagonalRight = 0;
+    isConnectedInDiagonal(coordinate) {
+      let countDiagonalRight = {counter: 0};
+      for (let row = coordinate.row, col = coordinate.col; row <= MAX_ROWS & col >= MIN_COLUMNS; row++, col--) {
+        if (isConnect4(countDiagonalRight, {...coordinate, row, col})) {
+          return true;
         }
       }
-      let countDiagonalLeft = 0;
-      for (let row = token.row, col = token.col; row <= MAX_ROWS && col <= MAX_COLUMNS; row++, col++) {
-        if (grid[row][col] === token.player) {
-          countDiagonalLeft++;
-          if (countDiagonalLeft === TOKENS_CONNECTED_FOR_WIN) {
-            return true;
-          }
-        } else {
-          countDiagonalLeft = 0;
+      let countDiagonalLeft = {counter: 0};
+      for (let row = coordinate.row, col = coordinate.col; row <= MAX_ROWS && col <= MAX_COLUMNS; row++, col++) {
+        if (isConnect4(countDiagonalLeft, {...coordinate, row, col})) {
+          return true;
         }
       }
     }

@@ -1,70 +1,78 @@
 const { Console } = require("console-mpds");
 const console = new Console();
 
-initConnect4View().init();
+initConnect4View().play();
 
 function initConnect4View() {
   return {
-    init() {
+    play() {
       const continueDialogView = initYesNoDialogView(`Do you want to continue? (yes/no)`);
       do {
-        const gameMode = askGameMode();
+        const gameMode = initGameMode();
         initGameView(gameMode).play();
         continueDialogView.read();
       } while (continueDialogView.isAffirmative());
+    }
+  }
+}
 
-      function askGameMode() {
-        const gameModes = [[generateRandomPosition, generateRandomPosition],
-        [askPosition, generateRandomPosition],
-        [askPosition, askPosition]];
-        let error = false;
+function initGameMode() {
+  const gameModes = [[CPU(), CPU()],
+  [PlayerView(), CPU()],
+  [PlayerView(), PlayerView()]];
+  let error = false;
+  do {
+    let response = console.readNumber(`Dime el modo de juego:
+              (0) Demo-Game, (1) Player Vs CPU, (2) Player Vs Player`);
+    if (response === 0 || response === 1 || response === 2) {
+      return gameModes[response];
+    } else {
+      console.writeln(`El modo de juego ${response} no existe`);
+      error = true;
+    }
+  } while (error);
+
+  function CPU() {
+    return {
+      readToken(game) {
+        let token = {player: game.getPlayer()};
+        let correctColumn = true;
         do {
-          let response = console.readNumber(`Dime el modo de juego:
-                    (0) Demo-Game, (1) Player Vs CPU, (2) Player Vs Player`);
-          if (response === 0 || response === 1 || response === 2) {
-            return gameModes[response];
-          } else {
-            console.writeln(`El modo de juego ${response} no existe`);
-            error = true;
+          console.writeln(`--------------------------`);
+          token.col = parseInt(Math.random() * 7) + 1;
+          token.row = game.calculateRow(token.col);
+          if (1 > token.col || token.col > 7) {
+            correctColumn = false;
+          } else if (token.row === undefined) {
+            correctColumn = false;
           }
-        } while (error);
+        } while (!correctColumn);
 
-        function generateRandomPosition(game) {
-          let token = {player: game.getPlayer()};
-          let correctColumn = true;
-          do {
-            console.writeln(`--------------------------`);
-            token.col = parseInt(Math.random() * 7) + 1;
-            token.row = game.calculateRow(token.col);
-            if (1 > token.col || token.col > 7) {
-              correctColumn = false;
-            } else if (token.row === undefined) {
-              correctColumn = false;
-            }
-          } while (!correctColumn);
+        game.addToken(token);
+      }
+    }
+  }
 
-          return token;
-        }
+  function PlayerView() {
+    return {
+      readToken(game) {
+        let token = {player: game.getPlayer()};
+        let correctColumn = true;
+        do {
+          console.writeln(`--------------------------`);
+          token.col = console.readNumber(`Player ${token.player} Select column between (1 - 7)`);
+          token.row = game.calculateRow(token.col);
+          console.writeln(token.col);
+          if (1 > token.col || token.col > 7) {
+            console.writeln("Remember columns between 1 and 7");
+            correctColumn = false;
+          } else if (token.row === undefined) {
+            console.writeln("This column is full");
+            correctColumn = false;
+          }
+        } while (!correctColumn);
 
-        function askPosition(game) {
-          let token = {player: game.getPlayer()};
-          let correctColumn = true;
-          do {
-            console.writeln(`--------------------------`);
-            token.col = console.readNumber(`Player ${token.player} Select column between (1 - 7)`);
-            token.row = game.calculateRow(token.col);
-            console.writeln(token.col);
-            if (1 > token.col || token.col > 7) {
-              console.writeln("Remember columns between 1 and 7");
-              correctColumn = false;
-            } else if (token.row === undefined) {
-              console.writeln("This column is full");
-              correctColumn = false;
-            }
-          } while (!correctColumn);
-
-          return token;
-        }
+        game.addToken(token);
       }
     }
   }
@@ -100,8 +108,7 @@ function initGameView(players) {
       let gameFinished;
       do {
         showBoard();
-        const token = players[game.getTurn()](game);
-        game.addToken(token);
+        players[game.getTurn()].readToken(game);
         gameFinished = game.isWinner() || game.isTied();
         if (gameFinished) {
           showBoard();
@@ -124,7 +131,6 @@ function initGameView(players) {
 }
 
 function initGame() {
-  const MAX_TURNS = 42;
   let turn = initTurn();
   let board = initBoard();
   let currentToken = null;
@@ -158,7 +164,7 @@ function initGame() {
         || board.isConnectedInDiagonal(currentToken);
     },
     isTied() {
-      return turn.getTurns() === MAX_TURNS - 1;
+      return turn.getTurns() === turn.MAX_TURNS - 1;
     }
   }
 }
@@ -210,7 +216,7 @@ function initBoard() {
     isConnectedInHorizontal(token) {
       let countHorizontal = 0;
       for (let col = MIN_COLUMNS; col <= MAX_COLUMNS; col++) {
-        if (grid[token.row][col - MIN_ROWS] === token.player) {
+        if (grid[token.row][col] === token.player) {
           countHorizontal++;
           if (countHorizontal === TOKENS_CONNECTED_FOR_WIN) {
             return true;
@@ -250,10 +256,12 @@ function initBoard() {
 function initTurn() {
 
   let numberOfTurns = 0;
+  const MAX_TURNS = 42;
   const PLAYER_1 = "X";
   const PLAYER_2 = "O";
 
   return {
+    MAX_TURNS,
     getPlayer() {
       return numberOfTurns % 2 === 0 ? PLAYER_1 : PLAYER_2;
     },

@@ -35,20 +35,20 @@ function initGameMode() {
   function CPU() {
     return {
       readToken(game) {
-        let token = {player: game.getPlayer()};
+        let coordinate = {};
         let correctColumn = true;
         do {
           console.writeln(`--------------------------`);
-          token.col = parseInt(Math.random() * 7) + 1;
-          token.row = game.calculateRow(token.col);
-          if (1 > token.col || token.col > 7) {
+          coordinate.col = parseInt(Math.random() * 7) + 1;
+          coordinate.row = game.calculateRow(coordinate.col);
+          if (1 > coordinate.col || coordinate.col > 7) {
             correctColumn = false;
-          } else if (token.row === undefined) {
+          } else if (coordinate.row === undefined) {
             correctColumn = false;
           }
         } while (!correctColumn);
 
-        game.addToken(token);
+        game.addToken({player: game.getPlayer(), ...coordinate});
       }
     }
   }
@@ -56,23 +56,22 @@ function initGameMode() {
   function PlayerView() {
     return {
       readToken(game) {
-        let token = {player: game.getPlayer()};
+        let coordinate = {};
         let correctColumn = true;
         do {
           console.writeln(`--------------------------`);
-          token.col = console.readNumber(`Player ${token.player} Select column between (1 - 7)`);
-          token.row = game.calculateRow(token.col);
-          console.writeln(token.col);
-          if (1 > token.col || token.col > 7) {
+          coordinate.col = console.readNumber(`Player ${game.getPlayer()} Select column between (1 - 7)`);
+          coordinate.row = game.calculateRow(coordinate.col);
+          if (1 > coordinate.col || coordinate.col > 7) {
             console.writeln("Remember columns between 1 and 7");
             correctColumn = false;
-          } else if (token.row === undefined) {
+          } else if (coordinate.row === undefined) {
             console.writeln("This column is full");
             correctColumn = false;
           }
         } while (!correctColumn);
 
-        game.addToken(token);
+        game.addToken({player: game.getPlayer(), ...coordinate});
       }
     }
   }
@@ -107,25 +106,23 @@ function initGameView(players) {
       console.writeln(`----- CONNECT4 -----`);
       let gameFinished;
       do {
-        showBoard();
+        this.showBoard();
         players[game.getTurn()].readToken(game);
         gameFinished = game.isWinner() || game.isTied();
         if (gameFinished) {
-          showBoard();
-          showFinalMsg();
+          this.showBoard();
+          this.showFinalMsg();
         }
         game.changeTurn();
       } while (!gameFinished);
-
-      function showBoard() {
-        for (let row = 0; row < game.getBoardLength(); row++) {
-          console.writeln(game.getBoardRow(row));
-        }
+    },
+    showBoard() {
+      for (let row = 0; row < game.getBoardLength(); row++) {
+        console.writeln(game.getBoardRow(row));
       }
-
-      function showFinalMsg() {
-        game.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${game.getPlayer()}`);
-      }
+    },
+    showFinalMsg() {
+      game.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${game.getPlayer()}`);
     }
   }
 }

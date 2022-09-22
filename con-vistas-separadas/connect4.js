@@ -211,32 +211,32 @@ function initBoard() {
     addToken(coordinate, player) {
       grid[coordinate.row][coordinate.col] = player;
     },
-    isConnectedInVertical(coordinate) {
+    isConnectedInVertical(currentToken) {
       let countVertical = {counter: 0};
-      for (let row = coordinate.row; row <= MAX_ROWS; row++) {
-        if (isConnect4(countVertical, {...coordinate, row})) {
+      for (let row = currentToken.row; row <= MAX_ROWS; row++) {
+        if (isConnect4(countVertical, {...currentToken, row})) {
           return true;
         }
       }
     },
-    isConnectedInHorizontal(coordinate) {
+    isConnectedInHorizontal(currentToken) {
       let countHorizontal = {counter: 0};
       for (let col = MIN_COLUMNS; col <= MAX_COLUMNS; col++) {
-        if (isConnect4(countHorizontal, {...coordinate, col})) {
+        if (isConnect4(countHorizontal, {...currentToken, col})) {
           return true;
         }
       }
     },
-    isConnectedInDiagonal(coordinate) {
+    isConnectedInDiagonal(currentToken) {
       let countDiagonalRight = {counter: 0};
-      for (let row = coordinate.row, col = coordinate.col; row <= MAX_ROWS & col >= MIN_COLUMNS; row++, col--) {
-        if (isConnect4(countDiagonalRight, {...coordinate, row, col})) {
+      for (let row = currentToken.row, col = currentToken.col; row <= MAX_ROWS & col >= MIN_COLUMNS; row++, col--) {
+        if (isConnect4(countDiagonalRight, {...currentToken, row, col})) {
           return true;
         }
       }
       let countDiagonalLeft = {counter: 0};
-      for (let row = coordinate.row, col = coordinate.col; row <= MAX_ROWS && col <= MAX_COLUMNS; row++, col++) {
-        if (isConnect4(countDiagonalLeft, {...coordinate, row, col})) {
+      for (let row = currentToken.row, col = currentToken.col; row <= MAX_ROWS && col <= MAX_COLUMNS; row++, col++) {
+        if (isConnect4(countDiagonalLeft, {...currentToken, row, col})) {
           return true;
         }
       }

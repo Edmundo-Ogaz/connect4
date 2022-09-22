@@ -49,7 +49,7 @@ function CPU() {
         }
       } while (!correctColumn);
 
-      game.addToken({player: game.getPlayer(), ...coordinate});
+      game.addToken(coordinate, game.getPlayer());
     }
   }
 }
@@ -73,7 +73,7 @@ function PlayerView() {
         }
       } while (!correctColumn);
 
-      game.addToken({player: game.getPlayer(), ...coordinate});
+      game.addToken(coordinate, game.getPlayer());
     }
   }
 }
@@ -105,17 +105,17 @@ function initGameView(players) {
   return {
     play() {
       console.writeln(`----- CONNECT4 -----`);
+      this.showBoard();
       let gameFinished;
       do {
-        this.showBoard();
         players[game.getTurn()].readToken(game);
         gameFinished = game.isWinner() || game.isTied();
-        if (gameFinished) {
-          this.showBoard();
-          this.showFinalMsg();
+        if (!gameFinished) {
+          game.changeTurn();
         }
-        game.changeTurn();
+        this.showBoard();
       } while (!gameFinished);
+      this.showFinalMsg();
     },
     showBoard() {
       for (let row = 0; row < game.getBoardLength(); row++) {
@@ -149,9 +149,9 @@ function initGame() {
     changeTurn() {
       turn.changeTurn();
     },
-    addToken(coordinate) {
-      currentToken = coordinate;
-      board.addToken(coordinate);
+    addToken(coordinate, player) {
+      currentToken = {...coordinate, player};
+      board.addToken(coordinate, player);
     },
     calculateRow(col) {
       return board.calculateRow(col);
@@ -208,8 +208,8 @@ function initBoard() {
         }
       }
     },
-    addToken(coordinate) {
-      grid[coordinate.row][coordinate.col] = coordinate.player;
+    addToken(coordinate, player) {
+      grid[coordinate.row][coordinate.col] = player;
     },
     isConnectedInVertical(coordinate) {
       let countVertical = {counter: 0};

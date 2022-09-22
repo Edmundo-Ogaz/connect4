@@ -102,10 +102,11 @@ function initYesNoDialogView(question) {
 
 function initGameView(players) {
   let game = initGame();
+  let boardView = initBoardView(game.getBoard());
   return {
     play() {
       console.writeln(`----- CONNECT4 -----`);
-      this.showBoard();
+      boardView.showBoard();
       let gameFinished;
       do {
         players[game.getTurn()].readToken(game);
@@ -113,17 +114,22 @@ function initGameView(players) {
         if (!gameFinished) {
           game.changeTurn();
         }
-        this.showBoard();
+        boardView.showBoard();
       } while (!gameFinished);
       this.showFinalMsg();
     },
-    showBoard() {
-      for (let row = 0; row < game.getBoardLength(); row++) {
-        console.writeln(game.getBoardRow(row));
-      }
-    },
     showFinalMsg() {
       game.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${game.getPlayer()}`);
+    }
+  }
+}
+
+function initBoardView(board) {
+  return {
+    showBoard() {
+      for (let row = 0; row <= board.MAX_ROWS; row++) {
+        console.writeln(board.getRow(row));
+      }
     }
   }
 }
@@ -134,11 +140,8 @@ function initGame() {
   let currentToken = null;
 
   return {
-    getBoardLength() {
-      return board.getLength();
-    },
-    getBoardRow(number) {
-      return board.getRow(number);
+    getBoard() {
+      return board;
     },
     getTurn() {
       return turn.getTurn();
@@ -183,7 +186,6 @@ function initBoard() {
 
 
   function isConnect4(connect4, {row, col, player}) {
-    console.writeln(JSON.stringify(connect4));
     if (grid[row][col] === player) {
       connect4.counter++;
       if (connect4.counter === TOKENS_CONNECTED_FOR_WIN) {
@@ -195,9 +197,7 @@ function initBoard() {
   }
 
   return {
-    getLength() {
-      return grid.length;
-    },
+    MAX_ROWS,
     getRow(number) {
       return grid[number];
     },

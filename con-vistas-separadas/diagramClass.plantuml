@@ -1,10 +1,12 @@
 @startuml
 Connect4 ..> YesNoDialogView
 Connect4 ..> GameView
-Connect4 : + init()
-Connect4 : - askGameMode()
-Connect4 ..> PlayerView
-Connect4 ..> CPU
+Connect4 ..> GameModeView
+Connect4 : + play()
+
+GameModeView ..> PlayerView
+GameModeView ..> CPU
+GameModeView : + ask()
 
 YesNoDialogView : - question
 YesNoDialogView : - answer
@@ -13,23 +15,20 @@ YesNoDialogView : + isAffirmative()
 YesNoDialogView : + isNegative()
 
 CPU : + readToken()
-CPU ..>Token
-
 PlayerView : + readToken()
-PlayerView ..>Token
 
 GameView : - players
 GameView *--> Game
 GameView : + play()
-GameView : - showBoard()
 GameView : - showFinalMsg()
+GameView *--> BoardView
 
-Game : - MAX_TURNS
-Game : - currentToken
+BoardView : + showBoar()
+
 Game *--> Board
 Game *--> Turn
-Game : + getBoardLength()
-Game : + getBoardRow(number)
+Game *--> Checker
+Game : + getBoard()
 Game : + getTurn()
 Game : + getPlayer()
 Game : + changeTurn() {
@@ -40,19 +39,16 @@ Game : + isTied()
 
 Board : - MIN_ROWS
 Board : - MIN_COLUMNS
-Board : - MAX_ROWS
+Board : + MAX_ROWS
 Board : - MAX_COLUMNS
-Board : - TOKENS_CONNECTED_FOR_WIN
-Board : - grid
-Board : + getLength() 
-Board : + getRow(number) {
+Board : - grid    
+Board : + getCell(coordinate)
+Board : + getRow(number)
 Board : + calculateRow(col)
-Board : + addToken(token) {
-Board : + isConnectedInVertical(token)
-Board : + isConnectedInHorizontal(token)
-Board : + isConnectedInDiagonal(token)
+Board : + addToken(token)
 
 Turn : - numberOfRounds
+Turn : + MAX_TURNS
 Turn : - PLAYER_1
 Turn : - PLAYER_2
 Turn : + getPlayer()
@@ -60,8 +56,28 @@ Turn : + getTurns()
 Turn : + getTurn()
 Turn : + changeTurn()
 
-Token : + row
-Token : + col
-Token : + player
+Checker : - currentToken
+Checker : - TOKENS_CONNECTED_FOR_WIN
+Checker : + setCurrentToken(token)
+Checker : - isConnect4(direction, board)
+Checker : + isConnectedInVertical(board)
+Checker : + isConnectedInHorizontal(board)
+Checker : + isConnectedInDiagonalPrincipal(board)
+Checker : + isConnectedInDiagonalSecond(board)
+Checker ..> Direcition
+
+Direcition *--> Coordinate
+Direcition : + getDirection
+Direcition : + getOppocite
+
+Coordinate : - x
+Coordinate : - y
+Coordinate : + getNorth() 
+Coordinate : + getSouth() 
+Coordinate : + getEast() 
+Coordinate : + getWest() 
+Coordinate : + getNorthEast() 
+Coordinate : + getSouthEast() 
+Coordinate : + getSouthWest() 
 
 @enduml

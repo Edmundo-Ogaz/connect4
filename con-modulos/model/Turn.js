@@ -2,6 +2,7 @@ class Turn {
 
   constructor() {
     this.numberOfTurns = 0;
+    this.MAX_TURNS = 42;
     this.PLAYER_1 = "X";
     this.PLAYER_2 = "O";
   }

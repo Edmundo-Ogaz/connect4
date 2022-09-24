@@ -16,13 +16,13 @@ class YesNoDialogView {
       this.answer = console.readString(this.question);
       error = !this.isAffirmative() && !this.isNegative();
       if (error) {
-        console.writeln(`Por favor, responda "si" o "no"`);
+        console.writeln(`Please answer "yes" or "no"`);
       }
     } while (error);
   }
 
   isAffirmative() {
-    return this.answer === `si`;
+    return this.answer === `yes`;
   }
 
   isNegative() {

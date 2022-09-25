@@ -17,9 +17,9 @@ function initConnect4View() {
 }
 
 function initGameMode() {
-  const gameModes = [[CPU(), CPU()],[PlayerView(), CPU()],[PlayerView(), PlayerView()]];
   return {
     ask() {
+      const gameModes = [[initCPU(), initCPU()],[initPlayerView(), initCPU()],[initPlayerView(), initPlayerView()]];
       let error = false;
       do {
         let response = console.readNumber(`Tell me the game mode:
@@ -35,7 +35,7 @@ function initGameMode() {
   }
 }
 
-function CPU() {
+function initCPU() {
   return {
     readToken(game) {
       let token = {player: game.getPlayer()};
@@ -56,7 +56,7 @@ function CPU() {
   }
 }
 
-function PlayerView() {
+function initPlayerView() {
   return {
     readToken(game) {
       let token = {player: game.getPlayer()};
@@ -128,7 +128,8 @@ function initGameView(players) {
 function initBoardView(board) {
   return {
     showBoard() {
-      for (let row = 0; row <= board.MAX_ROWS; row++) {
+      console.writeln(board.getRow(0));
+      for (let row = board.MAX_ROWS; row > 0; row--) {
         console.writeln(board.getRow(row));
       }
     }
@@ -178,12 +179,12 @@ function initBoard() {
   const MAX_ROWS = 6;
   const MAX_COLUMNS = 7;
   let grid = [["*", "1", "2", "3", "4", "5", "6", "7"],
-  ["1", "_", "_", "_", "_", "_", "_", "_"],
-  ["2", "_", "_", "_", "_", "_", "_", "_"],
-  ["3", "_", "_", "_", "_", "_", "_", "_"],
-  ["4", "_", "_", "_", "_", "_", "_", "_"],
-  ["5", "_", "_", "_", "_", "_", "_", "_"],
-  ["6", "_", "_", "_", "_", "_", "_", "_"]];
+              ["1", "_", "_", "_", "_", "_", "_", "_"],
+              ["2", "_", "_", "_", "_", "_", "_", "_"],
+              ["3", "_", "_", "_", "_", "_", "_", "_"],
+              ["4", "_", "_", "_", "_", "_", "_", "_"],
+              ["5", "_", "_", "_", "_", "_", "_", "_"],
+              ["6", "_", "_", "_", "_", "_", "_", "_"]];
 
   return {
     MAX_ROWS,
@@ -194,7 +195,7 @@ function initBoard() {
       return grid[number];
     },
     calculateRow(col) {
-      for (let row = grid.length - 1; row >= 0; row--) {
+      for (let row = 1; row < grid.length - 1; row++) {
         if (grid[row][col] === "_") {
           return row;
         }
@@ -235,7 +236,7 @@ function initChecker() {
   let currentToken;
   const TOKENS_CONNECTED_FOR_WIN = 4;
   
-  function isConnect4(direction, board){
+  function isConnect4(direction, board) {
     for (let i = 1; i < TOKENS_CONNECTED_FOR_WIN; i++) {
       if (board.getCell(direction[i]) !== currentToken.player) {
         return false;
@@ -272,24 +273,29 @@ function initChecker() {
 
 function initDirection(type, token) {
 
-  const UP = `UP`;
-  const DOWN = `DOWN`
-  const RIGHT = `RIGHT`;
-  const LEFT = `LEFT`;
-  const DIAGONAL_PRINCIPAL = `DIAGONAL_PRINCIPAL`;
-  const DIAGONAL_SECOND = `DIAGONAL_SECOND`;
+  const LENGTH = 4;
+  let direction = geCoordinates();
 
-  let direction = [initCoordinate(token.col, token.row)];
-  for (let i = 0; i < 4; i++) {
-    if (type === DOWN) {
-      direction.push(direction[i].getNorth());
-    } else if (type === RIGHT) {
-      direction.push(direction[i].getEast());
-    } else if (type === DIAGONAL_PRINCIPAL) {
-      direction.push(direction[i].getNorthEast());
-    } else if (type === DIAGONAL_SECOND) {
-      direction.push(direction[i].getSouthEast());
+  function geCoordinates(isOpposite) {
+    let coordinates = [initCoordinate(token.col, token.row)];
+    for (let i = 0; i < LENGTH; i++) {
+      if (type === `DOWN`) {
+        coordinates.push(coordinates[i].getSouth());
+      } else if (type === `RIGHT` && isOpposite) {
+        coordinates.push(coordinates[i].getWest());
+      } else if (type === `RIGHT`) {
+        coordinates.push(coordinates[i].getEast());
+      } else if (type === `DIAGONAL_PRINCIPAL` && isOpposite) {
+        coordinates.push(coordinates[i].getSouthWest());
+      } else if (type === `DIAGONAL_PRINCIPAL`) {
+        coordinates.push(coordinates[i].getNorthEast());
+      } else if (type === `DIAGONAL_SECOND` && isOpposite) {
+        coordinates.push(coordinates[i].getNorthWest());
+      } else if (type === `DIAGONAL_SECOND`) {
+        coordinates.push(coordinates[i].getSouthEast());
+      }
     }
+    return coordinates;
   }
 
   return {
@@ -297,17 +303,7 @@ function initDirection(type, token) {
       return direction;
     },
     getOppocite() {
-      let oppocite = [direction[0]];
-      for (let i = 0; i < 4; i++) {
-        if (type === RIGHT) {
-          oppocite.push(oppocite[i].getWest());
-        } else if (type === DIAGONAL_PRINCIPAL) {
-          oppocite.push(oppocite[i].getSouthWest());
-        } else if (type === DIAGONAL_SECOND) {
-          oppocite.push(oppocite[i].getNorthWest());
-        }
-      }
-      return oppocite;
+      return geCoordinates(true);
     }
   }
 }

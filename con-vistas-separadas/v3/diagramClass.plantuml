@@ -1,5 +1,6 @@
 @startuml
 Connect4 ..> YesNoDialogView
+Connect4 ..> Game
 Connect4 ..> GameView
 Connect4 : + play()
 
@@ -10,11 +11,11 @@ YesNoDialogView : + isAffirmative()
 YesNoDialogView : + isNegative()
 
 GameView : + play()
-GameView *--> Game
 GameView *--> PlayerView
 GameView *--> BoardView
 
 PlayerView : + putToken()
+PlayerView ..> Coordinate
 
 BoardView : + showBoard()
 
@@ -22,28 +23,27 @@ Game *--> Board
 Game *--> Turn
 Game *--> Checker
 Game : + getBoard()
-Game : + getPlayer()
+Game : + getColor()
 Game : + changeTurn() {
-Game : + addToken(token)
+Game : + addToken(coordinate)
 Game : + calculateRow(col)
 Game : + isWinner()
 Game : + isTied()
 
-Board : - MIN_ROWS
-Board : - MIN_COLUMNS
+Board : - EMPTY_CELL
 Board : + MAX_ROWS
-Board : - MAX_COLUMNS
-Board : - grid    
+Board : + MAX_COLUMNS
+Board : - cells 
+Board : - initCells()   
 Board : + getCell(coordinate)
-Board : + getRow(number)
 Board : + calculateRow(col)
-Board : + addToken(token)
+Board : + addToken(coordinate, color)
 
 Turn : - numberOfRounds
 Turn : + MAX_TURNS
-Turn : - PLAYERS
+Turn : - COLORS
 Turn : - getTurn()
-Turn : + getPlayer()
+Turn : + getColor()
 Turn : + changeTurn()
 Turn : + isFinished()
 
@@ -52,11 +52,11 @@ Checker : - TOKENS_CONNECTED_FOR_WIN
 Checker : + setCurrentToken(token)
 Checker : - isConnect4(direction, board)
 Checker : + isWinner(board)
-Checker ..> Direcition
+Checker ..> Line
 
-Direcition *--> Coordinate
-Direcition : + getDirection
-Direcition : + getOppocite
+Line *--> Coordinate
+Line : + getLine()
+Line : + getOppocite()
 
 Coordinate : - x
 Coordinate : - y

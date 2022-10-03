@@ -8,7 +8,8 @@ function initConnect4View() {
     play() {
       const continueDialogView = initYesNoDialogView(`Do you want to continue? (yes/no)`);
       do {
-        initGameView().play();
+        let game = initGame();
+        initGameView(game).play();
         continueDialogView.read();
       } while (continueDialogView.isAffirmative());
     }
@@ -37,8 +38,7 @@ function initYesNoDialogView(question) {
   };
 }
 
-function initGameView() {
-  let game = initGame();
+function initGameView(game) {
   let playerView = initPlayerView(game);
   let boardView = initBoardView(game.getBoard());
   return {
@@ -54,7 +54,7 @@ function initGameView() {
         }
         boardView.showBoard();
       } while (!gameFinished);
-      console.writeln(game.isTied() ? `Tied Game` : `The winner is the player ${game.getPlayer()}`);
+      console.writeln(game.isTied() ? `Tied Game` : `The winner is the player ${game.getColor()}`);
     }
   }
 }
@@ -66,9 +66,9 @@ function initPlayerView(game) {
       let correctColumn = true;
       do {
         console.writeln(`--------------------------`);
-        col = console.readNumber(`Player ${game.getPlayer()} Select column between (1 - 7)`);
+        col = console.readNumber(`Player ${game.getColor()} Select column between (1 - 7)`);
         row = game.calculateRow(col - 1);
-        if (1 > col || col > 7) {
+        if (col < 1 || 7 < col) {
           console.writeln("Remember columns between 1 and 7");
           correctColumn = false;
         } else if (row === undefined) {
@@ -77,7 +77,7 @@ function initPlayerView(game) {
         }
       } while (!correctColumn);
 
-      game.addToken({x: col - 1, y: row});
+      game.addToken(initCoordinate(col - 1, row));
     }
   }
 }
@@ -88,7 +88,10 @@ function initBoardView(board) {
       console.writeln(`* 1 2 3 4 5 6 7`);;
       for (let row = board.MAX_ROWS - 1; row >= 0; row--) {
         console.write(`${row + 1} `);
-        console.writeln(board.getRow(row));
+        for (let col = 0; col < board.MAX_COLUMNS; col++) {
+          console.write(`${board.getCell(initCoordinate(col, row)) ?? "_"},`);
+        }
+        console.writeln();
       }
     }
   }
@@ -103,15 +106,15 @@ function initGame() {
     getBoard() {
       return board;
     },
-    getPlayer() {
-      return turn.getPlayer();
+    getColor() {
+      return turn.getColor();
     },
     changeTurn() {
       turn.changeTurn();
     },
     addToken(coordinate) {
       checker.setCurrentCoordinate(coordinate);
-      board.addToken(coordinate, turn.getPlayer());
+      board.addToken(coordinate, turn.getColor());
     },
     calculateRow(col) {
       return board.calculateRow(col);
@@ -126,37 +129,29 @@ function initGame() {
 }
 
 function initBoard() {
-  const MIN_ROWS = 1;
-  const MIN_COLUMNS = 1;
+  const EMPTY_CELL = undefined;
   const MAX_ROWS = 6;
   const MAX_COLUMNS = 7;
-  let grid = [["_", "_", "_", "_", "_", "_", "_"],
-              ["_", "_", "_", "_", "_", "_", "_"],
-              ["_", "_", "_", "_", "_", "_", "_"],
-              ["_", "_", "_", "_", "_", "_", "_"],
-              ["_", "_", "_", "_", "_", "_", "_"],
-              ["_", "_", "_", "_", "_", "_", "_"]];
+  let cells = Array.from(Array(MAX_ROWS), () => Array(MAX_COLUMNS));
 
   return {
     MAX_ROWS,
+    MAX_COLUMNS,
     getCell(coordinate) {
       if (0 > coordinate.y || coordinate.y >= MAX_ROWS) {
         return undefined;
       }
-      return grid[coordinate.y][coordinate.x];
-    },
-    getRow(number) {
-      return grid[number];
+      return cells[coordinate.y][coordinate.x];
     },
     calculateRow(col) {
-      for (let row = 0; row < grid.length - 1; row++) {
-        if (grid[row][col] === "_") {
+      for (let row = 0; row < cells.length - 1; row++) {
+        if (cells[row][col] === EMPTY_CELL) {
           return row;
         }
       }
     },
-    addToken(coordinate, player) {
-      grid[coordinate.y][coordinate.x] = player;
+    addToken(coordinate, color) {
+      cells[coordinate.y][coordinate.x] = color;
     }
   }
 }
@@ -165,15 +160,15 @@ function initTurn() {
 
   let numberOfTurns = 0;
   const MAX_TURNS = 42;
-  const PLAYERS = ["X", "O"];
+  const COLORS = ["R", "Y"];
 
   function getTurn() {
     return numberOfTurns % 2;
   }
 
   return {
-    getPlayer() {
-      return getTurn() === 0 ? PLAYERS[0] : PLAYERS[1];
+    getColor() {
+      return COLORS[getTurn()];
     },
     changeTurn() {
       numberOfTurns++;
@@ -204,41 +199,41 @@ function initChecker() {
       currentCoordinate = coordinate;
     },
     isWinner(board) {
-      const SOUTH = initCoordinate(0, -1);
-      const WEST = initCoordinate(-1, 0);
-      const SOUTH_WEST = initCoordinate(-1, -1);
-      const NORTH_WEST = initCoordinate(1, -1);
+      const SOUTH = initLine(currentCoordinate, initCoordinate(0, -1));
+      const WEST = initLine(currentCoordinate, initCoordinate(-1, 0));
+      const SOUTH_WEST = initLine(currentCoordinate, initCoordinate(-1, -1));
+      const NORTH_WEST = initLine(currentCoordinate, initCoordinate(1, -1));
       const DIRECTIONS = [SOUTH, WEST, SOUTH_WEST, NORTH_WEST];
       let isWinner = false;
       for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
-        let direction = initDirection(currentCoordinate, DIRECTIONS[i]);
-        isWinner = isConnect4(direction.getDirection(), board)
-          || isConnect4(direction.getOppocite(DIRECTIONS[i]), board);;
+        isWinner = isConnect4(DIRECTIONS[i].getLine(), board)
+          || isConnect4(DIRECTIONS[i].getOppocite(), board);;
       }
       return isWinner;
     }
   }
 }
 
-function initDirection(initial, coordinateShift) {
+function initLine(initial, coordinateShift) {
     
   const LENGTH = 4;
-  let coordenates = [initCoordinate(initial.x, initial.y)];
-  for (let i = 0; i < LENGTH - 1; i++) {
-    coordenates.push(coordenates[i].shift(coordinateShift));
+  let coordenates = getCoordenates(initial, coordinateShift);
+  let oppocite = getCoordenates(initial, initCoordinate(coordinateShift.x * -1, coordinateShift.y * -1));
+
+  function getCoordenates(initial, coordinateShift) {
+    let coordenates = [initCoordinate(initial.x, initial.y)];
+    for (let i = 0; i < LENGTH - 1; i++) {
+      coordenates.push(coordenates[i].shift(coordinateShift));
+    }
+    return coordenates;
   }
 
   return {
-    getDirection() {
+    getLine() {
       return coordenates;
     },
-    getOppocite(coordinateShift) {
-      const OPPOCITE = {x: coordinateShift.x * -1, y: coordinateShift.y * -1};
-      let direction = [coordenates[0]];
-      for (let i = 0; i < LENGTH - 1; i++) {
-        direction.push(direction[i].shift(OPPOCITE));
-      }
-      return direction;
+    getOppocite() {
+      return oppocite;
     }
   }
 }

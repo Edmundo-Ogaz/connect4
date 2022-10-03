@@ -101,6 +101,7 @@ function initGame() {
   let turn = initTurn();
   let board = initBoard();
   let checker = initChecker();
+  let currentCoordinate;
 
   return {
     getBoard() {
@@ -113,14 +114,14 @@ function initGame() {
       turn.changeTurn();
     },
     addToken(coordinate) {
-      checker.setCurrentCoordinate(coordinate);
+      currentCoordinate = coordinate;
       board.addToken(coordinate, turn.getColor());
     },
     calculateRow(col) {
       return board.calculateRow(col);
     },
     isWinner() {
-      return checker.isWinner(board);
+      return board.isWinner(currentCoordinate);
     },
     isTied() {
       return turn.isFinished();
@@ -133,16 +134,29 @@ function initBoard() {
   const MAX_ROWS = 6;
   const MAX_COLUMNS = 7;
   let cells = Array.from(Array(MAX_ROWS), () => Array(MAX_COLUMNS));
+  const TOKENS_CONNECTED_FOR_WIN = 4;
+
+  function getCell(coordinate) {
+    if (0 > coordinate.y || coordinate.y >= MAX_ROWS) {
+      return undefined;
+    }
+    return cells[coordinate.y][coordinate.x];
+  }
+  
+  function isConnect4(direction) {
+    const TOKEN = getCell(direction[0]);
+    for (let i = 1; i < TOKENS_CONNECTED_FOR_WIN; i++) {
+      if (getCell(direction[i]) !== TOKEN) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   return {
     MAX_ROWS,
     MAX_COLUMNS,
-    getCell(coordinate) {
-      if (0 > coordinate.y || coordinate.y >= MAX_ROWS) {
-        return undefined;
-      }
-      return cells[coordinate.y][coordinate.x];
-    },
+    getCell,
     calculateRow(col) {
       for (let row = 0; row < cells.length - 1; row++) {
         if (cells[row][col] === EMPTY_CELL) {
@@ -152,6 +166,19 @@ function initBoard() {
     },
     addToken(coordinate, color) {
       cells[coordinate.y][coordinate.x] = color;
+    },
+    isWinner(currentCoordinate) {
+      const SOUTH = initLine(currentCoordinate, initCoordinate(0, -1));
+      const WEST = initLine(currentCoordinate, initCoordinate(-1, 0));
+      const SOUTH_WEST = initLine(currentCoordinate, initCoordinate(-1, -1));
+      const NORTH_WEST = initLine(currentCoordinate, initCoordinate(1, -1));
+      const DIRECTIONS = [SOUTH, WEST, SOUTH_WEST, NORTH_WEST];
+      let isWinner = false;
+      for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
+        isWinner = isConnect4(DIRECTIONS[i].getLine())
+          || isConnect4(DIRECTIONS[i].getOppocite());;
+      }
+      return isWinner;
     }
   }
 }

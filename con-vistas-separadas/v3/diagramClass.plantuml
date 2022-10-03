@@ -19,25 +19,28 @@ PlayerView ..> Coordinate
 
 BoardView : + showBoard()
 
+Game : - currentCoordinate
 Game *--> Board
 Game *--> Turn
-Game *--> Checker
 Game : + getBoard()
 Game : + getColor()
 Game : + changeTurn() {
 Game : + addToken(coordinate)
 Game : + calculateRow(col)
-Game : + isWinner()
+Game : + isWinner(currentCoordinate)
 Game : + isTied()
 
+Board ..> Line
 Board : - EMPTY_CELL
 Board : + MAX_ROWS
 Board : + MAX_COLUMNS
-Board : - cells 
-Board : - initCells()   
+Board : - cells
+Board : - TOKENS_CONNECTED_FOR_WIN
 Board : + getCell(coordinate)
+Board : - isConnect4(direction)
 Board : + calculateRow(col)
 Board : + addToken(coordinate, color)
+Board : + isWinner(currentCoordinate)
 
 Turn : - numberOfRounds
 Turn : + MAX_TURNS
@@ -46,13 +49,6 @@ Turn : - getTurn()
 Turn : + getColor()
 Turn : + changeTurn()
 Turn : + isFinished()
-
-Checker : - currentToken
-Checker : - TOKENS_CONNECTED_FOR_WIN
-Checker : + setCurrentToken(token)
-Checker : - isConnect4(direction, board)
-Checker : + isWinner(board)
-Checker ..> Line
 
 Line *--> Coordinate
 Line : + getLine()

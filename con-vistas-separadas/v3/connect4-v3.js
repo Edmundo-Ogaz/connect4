@@ -89,7 +89,7 @@ function initBoardView(board) {
       for (let row = board.MAX_ROWS - 1; row >= 0; row--) {
         console.write(`${row + 1} `);
         for (let col = 0; col < board.MAX_COLUMNS; col++) {
-          console.write(`${board.getCell(initCoordinate(col, row)) ?? "_"},`);
+          console.write(`${board.getCell(initCoordinate(col, row)) || "_"},`);
         }
         console.writeln();
       }

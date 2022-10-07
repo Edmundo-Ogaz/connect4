@@ -1,15 +1,15 @@
 const { Console } = require("console-mpds");
 const console = new Console();
 
-let { Game } = require('../model/Game');
+let { PlayerView } = require('./PlayerView');
 let { BoardView } = require('./BoardView');
 
 class GameView {
 
-  constructor(players) {
-    this.players = players;
-    this.game = new Game();
-    this.boardView = new BoardView(this.game.getBoard());
+  constructor(game) {
+    this.game = game;
+    this.playerView = new PlayerView(game);
+    this.boardView = new BoardView(game.getBoard());
   }
 
   play() {
@@ -17,18 +17,14 @@ class GameView {
     this.boardView.showBoard();
     let gameFinished;
     do {
-      this.players[this.game.getTurn()].readToken(this.game);
+      this.playerView.putToken();
       gameFinished = this.game.isWinner() || this.game.isTied();
       if (!gameFinished) {
         this.game.changeTurn();
       }
       this.boardView.showBoard();
     } while (!gameFinished);
-    this.showFinalMsg();
-  }
-
-  showFinalMsg() {
-    this.game.isTied() ? console.writeln(`Tied Game`) : console.writeln(`The winner is the player ${this.game.getPlayer()}`);
+    console.writeln(this.game.isTied() ? `Tied Game` : `The winner is the player ${this.game.getColor()}`);
   }
 }
 

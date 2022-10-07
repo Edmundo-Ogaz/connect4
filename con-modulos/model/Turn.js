@@ -4,23 +4,23 @@ class Turn {
     this.numberOfTurns = 0;
     this.MAX_TURNS = 42;
     this.PLAYER_1 = "X";
-    this.PLAYER_2 = "O";
-  }
-
-  getPlayer() {
-    return this.numberOfTurns % 2 === 0 ? this.PLAYER_1 : this.PLAYER_2;
-  }
-
-  getTurns() {
-    return this.numberOfTurns;
+    this.COLORS = ["R", "Y"];
   }
 
   getTurn() {
-    return this.numberOfTurns % 2 === 0 ? 0 : 1;
+    return this.numberOfTurns % 2;
+  }
+
+  getColor() {
+    return this.COLORS[this.getTurn()];
   }
 
   changeTurn() {
     this.numberOfTurns++;
+  }
+
+  isFinished() {
+    return this.numberOfTurns === this.MAX_TURNS - 1;
   }
 }
 

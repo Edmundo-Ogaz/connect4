@@ -5,37 +5,12 @@ class Coordinate {
     this.y = y;
   }
 
-  getNorth() {
-    return new Coordinate(this.x, this.y + 1);
-  }
-
-  getSouth() {
-    return new Coordinate(this.x, this.y - 1);
-  }
-
-  getEast() {
-    return new Coordinate(this.x + 1, this.y);
-  }
-
-  getWest() {
-    return new Coordinate(this.x - 1, this.y);
-  }
-
-  getNorthEast() {
-    return new Coordinate(this.x + 1, this.y + 1);
-  }
-
-  getSouthEast() {
-    return new Coordinate(this.x + 1, this.y - 1);
-  }
-
-  getSouthWest() {
-    return new Coordinate(this.x - 1, this.y - 1);
-  }
-
-  getNorthWest() {
-    return new Coordinate(this.x - 1, this.y + 1);
+  shift(coordinate) {
+    return new Coordinate(this.x + coordinate.x, this.y + coordinate.y);
   }
 }
+
+Coordinate.MAX_ROWS = 6;
+Coordinate.MAX_COLUMNS = 7;
 
 module.exports.Coordinate = Coordinate;

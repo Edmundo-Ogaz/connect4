@@ -1,34 +1,29 @@
 const { Board } = require('./Board');
 const { Turn } = require('./Turn');
-const { Checker } = require('./Checker');
 
 class Game {
 
   constructor() {
     this.turn = new Turn();
     this.board = new Board();
-    this.checker = new Checker();
+    this.currentCoordinate;
   }
 
   getBoard() {
     return this.board;
   }
 
-  getTurn() {
-    return this.turn.getTurn();
-  }
-
-  getPlayer() {
-    return this.turn.getPlayer();
+  getColor() {
+    return this.turn.getColor();
   }
 
   changeTurn() {
     this.turn.changeTurn();
   }
 
-  addToken(coordinate, player) {
-    this.checker.setCurrentToken({...coordinate, player});
-    this.board.addToken(coordinate, player);
+  addToken(coordinate) {
+    this.currentCoordinate = coordinate;
+    this.board.addToken(coordinate, this.turn.getColor());
   }
 
   calculateRow(col) {
@@ -36,14 +31,11 @@ class Game {
   }
 
   isWinner() {
-    return this.checker.isConnectedInHorizontal(this.board)
-      || this.checker.isConnectedInVertical(this.board)
-      || this.checker.isConnectedInDiagonalPrincipal(this.board)
-      || this.checker.isConnectedInDiagonalSecond(this.board);
+    return this.board.isWinner(this.currentCoordinate);
   }
 
   isTied() {
-    return this.turn.getTurns() === this.turn.MAX_TURNS - 1;
+    return this.turn.isFinished();
   }
 }
 

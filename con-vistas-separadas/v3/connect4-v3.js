@@ -220,17 +220,18 @@ function initTurn() {
 
 function initLine(initialCoordinate, coordinateShift) {
 
-  let coordenates = [initialCoordinate];
+  let coordinates = [initialCoordinate];
   for (let i = 0; i < initGame.TOKENS_CONNECTED_FOR_WIN - 1; i++) {
-    coordenates.push(coordenates[i].shift(coordinateShift));
+    coordinates.push(coordinates[i].shift(coordinateShift));
   }
 
   return {
     getCoordinates() {
-      return coordenates;
+      return coordinates;
     },
     displaceOne(coordinateShift) {
-      return initLine(coordenates[0].shift(coordinateShift), coordinateShift.getOppocite());
+      coordinates = coordinates.map(coordinate => coordinate.shift(coordinateShift));
+      return this;
     }
   }
 }

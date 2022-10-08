@@ -183,7 +183,7 @@ function initBoard() {
       let isWinner = false;
       for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
         let line = initLine(currentCoordinate, DIRECTIONS[i]);
-        isWinner = isConnect4(line.getCoordinates())
+        isWinner = isConnect4(line.getCoordinates());
           for (let j = 0; !isWinner && j < initGame.TOKENS_CONNECTED_FOR_WIN - 1; j++) {
             line = line.displaceOne(DIRECTIONS[i].getOppocite());
             isWinner = isConnect4(line.getCoordinates());;

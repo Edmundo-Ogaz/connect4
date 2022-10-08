@@ -3,27 +3,71 @@ const connect4 = require("./connect4-v3");
 const tests = [
     () => {
         let game = connect4.initGame()
-        game.addColor({col: 0, row: 0});
-        game.addColor({col: 1, row: 0});
-        game.addColor({col: 2, row: 0});
-        game.addColor({col: 3, row: 0});
+        game.addColor(0);
+        game.addColor(1);
+        game.addColor(2);
+        game.addColor(3);
         return game.isWinner();
     },
     () => {
         let game = connect4.initGame()
-        game.addColor({col: 3, row: 0});
-        game.addColor({col: 5, row: 0});
-        game.addColor({col: 6, row: 0});
-        game.addColor({col: 4, row: 0});
+        game.addColor(3);
+        game.addColor(5);
+        game.addColor(6);
+        game.addColor(4);
         return game.isWinner();
     },
     () => {
         let game = connect4.initGame()
-        game.addColor({col: 0, row: 2});
-        game.addColor({col: 2, row: 4});
-        game.addColor({col: 3, row: 5});
-        game.addColor({col: 1, row: 3});
+        game.addColor(0);
+        game.addColor(2);
+        game.addColor(3);
+        game.addColor(1);
         return game.isWinner();
+    },
+    () => {
+        let game = connect4.initGame()
+        game.addColor(0);
+        game.addColor(0);
+        game.addColor(0);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(1);
+        game.addColor(1);
+        game.addColor(1);
+        game.addColor(1);
+        return game.isWinner();
+    },
+    () => {
+        let game = connect4.initGame()
+        game.addColor(0);
+        game.addColor(0);
+        game.addColor(0);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(3);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(4);
+        game.addColor(1);
+        game.addColor(1);
+        game.addColor(1);
+        //game.addColor(1);
+        return false === game.isWinner();
     }
 ]
 

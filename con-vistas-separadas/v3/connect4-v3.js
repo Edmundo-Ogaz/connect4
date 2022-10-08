@@ -7,7 +7,7 @@ initCoordinate.MAX_COLUMNS = 7;
 
 initGame.TOKENS_CONNECTED_FOR_WIN = 4;
 
-//initConnect4View().play();
+initConnect4View().play();
 
 function initConnect4View() {
   return {

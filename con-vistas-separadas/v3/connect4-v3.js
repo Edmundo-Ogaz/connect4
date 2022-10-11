@@ -5,7 +5,7 @@ initCoordinate.MAX_ROWS = 6;
 initCoordinate.MIN_COLUMS = 1;
 initCoordinate.MAX_COLUMNS = 7;
 
-initGame.TOKENS_CONNECTED_FOR_WIN = 4;
+initLine.TOKENS_CONNECTED_FOR_WIN = 4;
 
 initConnect4View().play();
 
@@ -48,7 +48,7 @@ function initGameView(game) {
   let playerView = initPlayerView(game);
   let boardView = initBoardView(game.getBoard());
 
-  function showResult() {
+  function showFinalMsg() {
     console.writeln(game.isTied() ? `Tied Game` : `The winner is the player ${game.getCurrentColor()}`);
   }
 
@@ -65,7 +65,7 @@ function initGameView(game) {
         }
         boardView.show();
       } while (!gameFinished);
-        showResult();
+        showFinalMsg();
     }
   }
 }
@@ -78,10 +78,10 @@ function initPlayerView(game) {
         console.writeln(`--------------------------`);
         col = console.readNumber(`Player ${game.getCurrentColor()} Select column between (1 - 7)`);
         if (col < initCoordinate.MIN_COLUMS || initCoordinate.MAX_COLUMNS < col) {
-          console.writeln("Remember columns between 1 and 7");
+          console.writeln(`Remember columns between 1 and 7`);
           col = null;
         } else if (game.isFullColumn(col - 1)) {
-          console.writeln("This column is full");
+          console.writeln(`This column is full`);
           col = null;
         }
       } while (!col);
@@ -97,7 +97,7 @@ function initBoardView(board) {
       for (let row = initCoordinate.MAX_ROWS - 1; row >= 0; row--) {
         console.write(`${row + 1} `);
         for (let col = 0; col < initCoordinate.MAX_COLUMNS; col++) {
-          console.write(`${board.getColor(initCoordinate(col, row)) || "_"},`);
+          console.write(`${board.getColor(initCoordinate(row, col)) || "_"},`);
         }
         console.writeln();
       }
@@ -147,10 +147,10 @@ function initBoard() {
     }
   }
 
-  function isConnect4(coordinates) {
-    const COLOR = getColor(coordinates[0]);
-    for (let i = 1; i < initGame.TOKENS_CONNECTED_FOR_WIN; i++) {
-      if (getColor(coordinates[i]) !== COLOR) {
+  function isConnect4(line) {
+    const COLOR = getColor(line.get(0));
+    for (let i = 1; i < initLine.TOKENS_CONNECTED_FOR_WIN; i++) {
+      if (getColor(line.get(i)) !== COLOR) {
         return false;
       }
     }
@@ -158,10 +158,10 @@ function initBoard() {
   }
   
   function getColor(coordinate) {
-    if (0 > coordinate.row || coordinate.row >= initCoordinate.MAX_ROWS) {
+    if (0 > coordinate.getRow() || coordinate.getRow() >= initCoordinate.MAX_ROWS) {
       return undefined;
     }
-    return cells[coordinate.row][coordinate.col];
+    return cells[coordinate.getRow()][coordinate.getCol()];
   }
 
   return {
@@ -172,21 +172,21 @@ function initBoard() {
     addColor(col, color) {
       const row = calculateRow(col);
       cells[row][col] = color;
-      currentCoordinate = initCoordinate(col, row);
+      currentCoordinate = initCoordinate(row, col);
     },
     isWinner() {
-      const SOUTH = initCoordinate(0, -1);
-      const WEST = initCoordinate(-1, 0);
+      const SOUTH = initCoordinate(-1, 0);
+      const WEST = initCoordinate(0, -1);
       const SOUTH_WEST = initCoordinate(-1, -1);
       const NORTH_WEST = initCoordinate(1, -1);
       const DIRECTIONS = [SOUTH, WEST, SOUTH_WEST, NORTH_WEST];
       let isWinner = false;
       for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
         let line = initLine(currentCoordinate, DIRECTIONS[i]);
-        isWinner = isConnect4(line.getCoordinates());
-          for (let j = 0; !isWinner && j < initGame.TOKENS_CONNECTED_FOR_WIN - 1; j++) {
+        isWinner = isConnect4(line);
+          for (let j = 0; !isWinner && j < initLine.TOKENS_CONNECTED_FOR_WIN - 1; j++) {
             line = line.displaceOne(DIRECTIONS[i].getOppocite());
-            isWinner = isConnect4(line.getCoordinates());;
+            isWinner = isConnect4(line);
           } 
             
       }
@@ -221,31 +221,35 @@ function initTurn() {
 function initLine(initialCoordinate, coordinateShift) {
 
   let coordinates = [initialCoordinate];
-  for (let i = 0; i < initGame.TOKENS_CONNECTED_FOR_WIN - 1; i++) {
-    coordinates.push(coordinates[i].shift(coordinateShift));
+  for (let i = 0; i < initLine.TOKENS_CONNECTED_FOR_WIN - 1; i++) {
+    coordinates.push(coordinates[i].getShifted(coordinateShift));
   }
 
   return {
-    getCoordinates() {
-      return coordinates;
+    get(ordinal) {
+      return coordinates[ordinal];
     },
     displaceOne(coordinateShift) {
-      coordinates = coordinates.map(coordinate => coordinate.shift(coordinateShift));
+      coordinates = coordinates.map(coordinate => coordinate.getShifted(coordinateShift));
       return this;
     }
   }
 }
 
-function initCoordinate(col, row) {
+function initCoordinate(row, col) {
 
   return {
-    col,
-    row,
-    shift(coordinate) {
-      return initCoordinate(this.col + coordinate.col, this.row + coordinate.row);
+    getRow() {
+      return row;
+    },
+    getCol() {
+      return col;
+    },
+    getShifted(coordinateShift) {
+      return initCoordinate(row + coordinateShift.getRow(), col + coordinateShift.getCol());
     },
     getOppocite() {
-      return initCoordinate(this.col * -1, this.row * -1);
+      return initCoordinate(row * -1, col * -1);
     }
   }
 }

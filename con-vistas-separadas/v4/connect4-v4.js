@@ -19,18 +19,16 @@ initCoordinate.NUMBER_ROWS = 6;
 initCoordinate.NUMBER_COLUMNS = 7;
 
 let initDirection = function(row, col) {
-
-  return {
-    getRow() {
-      return row;
-    },
-    getCol() {
-      return col;
-    },
-    getOppocite() {
-      return initDirection(row * -1, col * -1);
+  return Object.create(
+    initCoordinate(row, col), 
+    {
+      getOppocite: {
+        value: function() {
+          return initDirection(row * -1, col * -1);
+        }
+      }
     }
-  }
+  );
 }
 initDirection.SOUTH = initDirection(-1, 0);
 initDirection.WEST = initDirection(0, -1);

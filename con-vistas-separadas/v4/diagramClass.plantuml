@@ -59,17 +59,15 @@ Line ..> Direction
 
 Direction : - col
 Direction : - row
-Direction : + getRow()
-Direction : + getCol()
 Direction : + getOppocite()
 
 Coordinate : - col
 Coordinate : - row
-Coordinate : + shift(direction)
 Coordinate : + getRow()
 Coordinate : + getCol()
-Coordinate : + {static} MAX_ROWS
-Coordinate : + {static} MIN_COLUMS
-Coordinate : + {static} MAX_COLUMNS
+Coordinate : + shift(direction)
+Coordinate : + {static} NUMBER_ROWS
+Coordinate : + {static} NUMBER_COLUMNS
+Coordinate <|--  Direction
 
 @enduml

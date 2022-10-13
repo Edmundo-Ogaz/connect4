@@ -1,0 +1,75 @@
+@startuml
+Connect4View ..> YesNoDialogView
+Connect4View ..> Game
+Connect4View ..> GameView
+Connect4View : + play()
+
+YesNoDialogView : - question
+YesNoDialogView : - answer
+YesNoDialogView : + read()
+YesNoDialogView : + isAffirmative()
+YesNoDialogView : + isNegative()
+
+GameView : - showResult()
+GameView : + play()
+GameView *--> PlayerView
+GameView *--> BoardView
+
+PlayerView : + putColor()
+
+BoardView : + show()
+BoardView ..> Coordinate
+
+Game *--> Board
+Game *--> Turn
+Game : + getBoard()
+Game : + getCurrentColor()
+Game : + changeTurn() {
+Game : + addColor(col)
+Game : + isFullColumn(col)
+Game : + isWinner()
+Game : + isTied()
+
+Board ..> Line
+Board ..> Coordinate
+Board : - cells
+Board : - EMPTY_CELL
+Board : - currentCoordinate
+Board : - calculateRow(col)
+Board : - isConnect4(line)
+Board : + getColor(coordinate)
+Board : + isFullColumn(col)
+Board : + addColor(col, color)
+Board : + isWinner()
+
+Turn : - numberOfRounds
+Turn : + MAX_TURNS
+Turn : - COLORS
+Turn : - getTurn()
+Turn : + getCurrentColor()
+Turn : + changeTurn()
+Turn : + isFinished()
+
+Line : + {static} TOKENS_CONNECTED_FOR_WIN
+Line *--> Coordinate
+Line : - coordenates
+Line : + get(ordinal)
+Line : + displaceOne(direction)
+Line ..> Direction
+
+Direction : - col
+Direction : - row
+Direction : + getRow()
+Direction : + getCol()
+Direction : + getOppocite()
+
+Coordinate : - col
+Coordinate : - row
+Coordinate : + shift(direction)
+Coordinate : + getRow()
+Coordinate : + getCol()
+Coordinate : + {static} MAX_ROWS
+Coordinate : + {static} MIN_COLUMS
+Coordinate : + {static} MAX_COLUMNS
+
+@enduml

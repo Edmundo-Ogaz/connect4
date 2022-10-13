@@ -1,5 +1,4 @@
 const { Console } = require("console-mpds");
-const { init } = require("list");
 const console = new Console();
 
 let initCoordinate = function(row, col) {
@@ -16,9 +15,8 @@ let initCoordinate = function(row, col) {
     },
   }
 }
-initCoordinate.MAX_ROWS = 6;
-initCoordinate.MIN_COLUMS = 1;
-initCoordinate.MAX_COLUMNS = 7;
+initCoordinate.NUMBER_ROWS = 6;
+initCoordinate.NUMBER_COLUMNS = 7;
 
 let initDirection = function(row, col) {
 
@@ -83,7 +81,7 @@ let initTurn = function() {
 }
 
 let initBoard = function() {
-  let cells = Array.from(Array(initCoordinate.MAX_ROWS), () => Array(initCoordinate.MAX_COLUMNS));
+  let cells = Array.from(Array(initCoordinate.NUMBER_ROWS), () => Array(initCoordinate.NUMBER_COLUMNS));
   const EMPTY_CELL = undefined;
   let currentCoordinate;
   
@@ -106,7 +104,7 @@ let initBoard = function() {
   }
   
   function getColor(coordinate) {
-    if (0 > coordinate.getRow() || coordinate.getRow() >= initCoordinate.MAX_ROWS) {
+    if (0 > coordinate.getRow() || coordinate.getRow() >= initCoordinate.NUMBER_ROWS) {
       return undefined;
     }
     return cells[coordinate.getRow()][coordinate.getCol()];
@@ -115,7 +113,7 @@ let initBoard = function() {
   return {
     getColor,
     isFullColumn(col) {
-      return cells[initCoordinate.MAX_ROWS - 1][col] !== EMPTY_CELL;
+      return cells[initCoordinate.NUMBER_ROWS - 1][col] !== EMPTY_CELL;
     },
     addColor(col, color) {
       const row = calculateRow(col);
@@ -175,7 +173,7 @@ let initPlayerView = function(game) {
       do {
         console.writeln(`--------------------------`);
         col = console.readNumber(`Player ${game.getCurrentColor()} Select column between (1 - 7)`);
-        if (col < initCoordinate.MIN_COLUMS || initCoordinate.MAX_COLUMNS < col) {
+        if (col < 1 || initCoordinate.NUMBER_COLUMNS < col) {
           console.writeln(`Remember columns between 1 and 7`);
           col = null;
         } else if (game.isFullColumn(col - 1)) {
@@ -192,9 +190,9 @@ let initBoardView = function(board) {
   return {
     show() {
       console.writeln(`* 1 2 3 4 5 6 7`);
-      for (let row = initCoordinate.MAX_ROWS - 1; row >= 0; row--) {
+      for (let row = initCoordinate.NUMBER_ROWS - 1; row >= 0; row--) {
         console.write(`${row + 1} `);
-        for (let col = 0; col < initCoordinate.MAX_COLUMNS; col++) {
+        for (let col = 0; col < initCoordinate.NUMBER_COLUMNS; col++) {
           console.write(`${board.getColor(initCoordinate(row, col)) || "_"},`);
         }
         console.writeln();
@@ -207,7 +205,7 @@ let initGameView = function(game) {
   let playerView = initPlayerView(game);
   let boardView = initBoardView(game.getBoard());
 
-  function showFinalMsg() {
+  function showResult() {
     console.writeln(game.isTied() ? `Tied Game` : `The winner is the player ${game.getCurrentColor()}`);
   }
 
@@ -224,7 +222,7 @@ let initGameView = function(game) {
         }
         boardView.show();
       } while (!gameFinished);
-        showFinalMsg();
+        showResult();
     }
   }
 }

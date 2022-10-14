@@ -1,30 +1,45 @@
 const { Console } = require("console-mpds");
 const console = new Console();
 
-let initCoordinate = function(row, col) {
+let  initClosedInterval = function(min, max) {
+  return {
+    isIncluded(value) {
+      return min <= value && value <= max;
+    }
+  }
+}
 
+let initCoordinate = function(row, column) {
   return {
     getRow() {
       return row;
     },
-    getCol() {
-      return col;
+    getColumn() {
+      return column;
     },
     getShifted(direction) {
-      return initCoordinate(row + direction.getRow(), col + direction.getCol());
+      return initCoordinate(row + direction.getRow(), column + direction.getColumn());
     },
   }
 }
 initCoordinate.NUMBER_ROWS = 6;
+initCoordinate.ROWS = initClosedInterval(0, initCoordinate.NUMBER_ROWS - 1);
 initCoordinate.NUMBER_COLUMNS = 7;
+initCoordinate.COLUMNS = initClosedInterval(0, initCoordinate.NUMBER_COLUMNS - 1);
+initCoordinate.isColumnValid = function(column) {
+  return initCoordinate.COLUMNS.isIncluded(column);
+}
+initCoordinate.isRowValid = function(row) {
+  return initCoordinate.ROWS.isIncluded(row);
+}
 
-let initDirection = function(row, col) {
+let initDirection = function(row, column) {
   return Object.create(
-    initCoordinate(row, col), 
+    initCoordinate(row, column), 
     {
       getOppocite: {
         value: function() {
-          return initDirection(row * -1, col * -1);
+          return initDirection(row * -1, column * -1);
         }
       }
     }
@@ -37,9 +52,8 @@ initDirection.NORTH_WEST = initDirection(1, -1);
 initDirection.VALUES = [initDirection.SOUTH,initDirection.WEST,initDirection.SOUTH_WEST,initDirection.NORTH_WEST];
 
 let initLine = function(initialCoordinate, direction) {
-
   let coordinates = [initialCoordinate];
-  for (let i = 0; i < initLine.TOKENS_CONNECTED_FOR_WIN - 1; i++) {
+  for (let i = 0; i < initLine.LENGTH - 1; i++) {
     coordinates.push(coordinates[i].getShifted(direction));
   }
 
@@ -53,10 +67,9 @@ let initLine = function(initialCoordinate, direction) {
     }
   }
 }
-initLine.TOKENS_CONNECTED_FOR_WIN = 4;
+initLine.LENGTH = 4;
 
 let initTurn = function() {
-
   let numberOfTurns = 0;
   const MAX_TURNS = 42;
   const COLORS = ["R", "Y"];
@@ -83,9 +96,9 @@ let initBoard = function() {
   const EMPTY_CELL = undefined;
   let currentCoordinate;
   
-  function calculateRow(col) {
+  function calculateRow(column) {
     for (let row = 0; row < cells.length; row++) {
-      if (cells[row][col] === EMPTY_CELL) {
+      if (cells[row][column] === EMPTY_CELL) {
         return row;
       }
     }
@@ -93,7 +106,7 @@ let initBoard = function() {
 
   function isConnect4(line) {
     const COLOR = getColor(line.get(0));
-    for (let i = 1; i < initLine.TOKENS_CONNECTED_FOR_WIN; i++) {
+    for (let i = 1; i < initLine.LENGTH; i++) {
       if (getColor(line.get(i)) !== COLOR) {
         return false;
       }
@@ -102,21 +115,20 @@ let initBoard = function() {
   }
   
   function getColor(coordinate) {
-    if (0 > coordinate.getRow() || coordinate.getRow() >= initCoordinate.NUMBER_ROWS) {
-      return undefined;
+    if (initCoordinate.isRowValid(coordinate.getRow())) {
+      return cells[coordinate.getRow()][coordinate.getColumn()];;
     }
-    return cells[coordinate.getRow()][coordinate.getCol()];
   }
 
   return {
     getColor,
-    isFullColumn(col) {
-      return cells[initCoordinate.NUMBER_ROWS - 1][col] !== EMPTY_CELL;
+    isFullColumn(column) {
+      return cells[initCoordinate.NUMBER_ROWS - 1][column] !== EMPTY_CELL;
     },
-    addColor(col, color) {
-      const row = calculateRow(col);
-      cells[row][col] = color;
-      currentCoordinate = initCoordinate(row, col);
+    addColor(column, color) {
+      const row = calculateRow(column);
+      cells[row][column] = color;
+      currentCoordinate = initCoordinate(row, column);
     },
     isWinner() {
       const DIRECTIONS = initDirection.VALUES;
@@ -124,7 +136,7 @@ let initBoard = function() {
       for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
         let line = initLine(currentCoordinate, DIRECTIONS[i]);
         isWinner = isConnect4(line);
-          for (let j = 0; !isWinner && j < initLine.TOKENS_CONNECTED_FOR_WIN - 1; j++) {
+          for (let j = 0; !isWinner && j < initLine.LENGTH - 1; j++) {
             line = line.displaceOne(DIRECTIONS[i].getOppocite());
             isWinner = isConnect4(line);
           } 
@@ -149,17 +161,20 @@ let initGame = function() {
     changeTurn() {
       turn.changeTurn();
     },
-    addColor(col) {
-      board.addColor(col, turn.getCurrentColor());
+    addColor(column) {
+      board.addColor(column, turn.getCurrentColor());
     },
-    isFullColumn(col) {
-      return board.isFullColumn(col);
+    isFullColumn(column) {
+      return board.isFullColumn(column);
     },
     isWinner() {
       return board.isWinner();
     },
     isTied() {
       return turn.isFinished();
+    },
+    isFinished() {
+      return board.isWinner() || turn.isFinished();
     }
   }
 }
@@ -167,19 +182,22 @@ let initGame = function() {
 let initPlayerView = function(game) {
   return {
     putColor() {
-      let col;
+      let column;
+      let valid;
       do {
         console.writeln(`--------------------------`);
-        col = console.readNumber(`Player ${game.getCurrentColor()} Select column between (1 - 7)`);
-        if (col < 1 || initCoordinate.NUMBER_COLUMNS < col) {
+        column = console.readNumber(`Player ${game.getCurrentColor()} Select column between (1 - 7)`) - 1;
+        valid = initCoordinate.isColumnValid(column);
+        if (!valid) {
           console.writeln(`Remember columns between 1 and 7`);
-          col = null;
-        } else if (game.isFullColumn(col - 1)) {
-          console.writeln(`This column is full`);
-          col = null;
+        } else {
+          valid = !game.isFullColumn(column)
+          if (!valid) {
+            console.writeln(`This column is full`);
+          }
         }
-      } while (!col);
-      game.addColor(col - 1);
+      } while (!valid);
+      game.addColor(column);
     }
   }
 }
@@ -190,8 +208,8 @@ let initBoardView = function(board) {
       console.writeln(`* 1 2 3 4 5 6 7`);
       for (let row = initCoordinate.NUMBER_ROWS - 1; row >= 0; row--) {
         console.write(`${row + 1} `);
-        for (let col = 0; col < initCoordinate.NUMBER_COLUMNS; col++) {
-          console.write(`${board.getColor(initCoordinate(row, col)) || "_"},`);
+        for (let column = 0; column < initCoordinate.NUMBER_COLUMNS; column++) {
+          console.write(`${board.getColor(initCoordinate(row, column)) || "_"},`);
         }
         console.writeln();
       }
@@ -214,11 +232,11 @@ let initGameView = function(game) {
       let gameFinished;
       do {
         playerView.putColor();
-        gameFinished = game.isWinner() || game.isTied();
+        boardView.show();
+        gameFinished = game.isFinished();
         if (!gameFinished) {
           game.changeTurn();
         }
-        boardView.show();
       } while (!gameFinished);
         showResult();
     }

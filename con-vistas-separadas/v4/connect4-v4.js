@@ -70,26 +70,19 @@ let initLine = function(initialCoordinate, direction) {
 initLine.LENGTH = 4;
 
 let initTurn = function() {
-  let numberOfTurns = 0;
-  const MAX_TURNS = 42;
+  let currentTurn = 0;
   const COLORS = ["R", "Y"];
-
-  function getTurn() {
-    return numberOfTurns % 2;
-  }
 
   return {
     getCurrentColor() {
-      return COLORS[getTurn()];
+      return COLORS[currentTurn];
     },
     changeTurn() {
-      numberOfTurns++;
-    },
-    isFinished() {
-      return numberOfTurns === MAX_TURNS - 1;
+      currentTurn = (currentTurn + 1) %  initTurn.NUMBER_PLAYERS;
     }
   }
 }
+initTurn.NUMBER_PLAYERS = 2;
 
 let initBoard = function() {
   let cells = Array.from(Array(initCoordinate.NUMBER_ROWS), () => Array(initCoordinate.NUMBER_COLUMNS));
@@ -122,13 +115,21 @@ let initBoard = function() {
 
   return {
     getColor,
-    isFullColumn(column) {
-      return cells[initCoordinate.NUMBER_ROWS - 1][column] !== EMPTY_CELL;
-    },
     addColor(column, color) {
       const row = calculateRow(column);
       cells[row][column] = color;
       currentCoordinate = initCoordinate(row, column);
+    },
+    isComplete(column) {
+      if (column !== undefined) {
+        return cells[initCoordinate.NUMBER_ROWS - 1][column] !== EMPTY_CELL;
+      }
+      for (let i = 0; i < initCoordinate.NUMBER_COLUMNS; i++) {
+          if (!this.isComplete(i)) {
+              return false;
+          }
+      }
+      return true;
     },
     isWinner() {
       const DIRECTIONS = initDirection.VALUES;
@@ -164,17 +165,14 @@ let initGame = function() {
     addColor(column) {
       board.addColor(column, turn.getCurrentColor());
     },
-    isFullColumn(column) {
-      return board.isFullColumn(column);
+    isComplete(column) {
+      return board.isComplete(column);
     },
     isWinner() {
       return board.isWinner();
     },
-    isTied() {
-      return turn.isFinished();
-    },
     isFinished() {
-      return board.isWinner() || turn.isFinished();
+      return board.isWinner() || board.isComplete();
     }
   }
 }
@@ -191,7 +189,7 @@ let initPlayerView = function(game) {
         if (!valid) {
           console.writeln(`Remember columns between 1 and 7`);
         } else {
-          valid = !game.isFullColumn(column)
+          valid = !game.isComplete(column)
           if (!valid) {
             console.writeln(`This column is full`);
           }
@@ -222,7 +220,7 @@ let initGameView = function(game) {
   let boardView = initBoardView(game.getBoard());
 
   function showResult() {
-    console.writeln(game.isTied() ? `Tied Game` : `The winner is the player ${game.getCurrentColor()}`);
+    console.writeln(game.isWinner() ? `The winner is the player ${game.getCurrentColor()}` : `Tied Game`);
   }
 
   return {

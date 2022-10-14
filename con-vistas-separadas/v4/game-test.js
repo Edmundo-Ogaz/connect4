@@ -82,7 +82,7 @@ const tests = [
         game.addColor(COLUMN_1);
         game.addColor(COLUMN_1);
         game.addColor(COLUMN_1);
-        return game.isFullColumn(COLUMN_1);
+        return game.isComplete(COLUMN_1);
     },
     () => {//COLOCANDO TODAS LAS FICHAS EN EL TABLERO Y PREGUNTANDO SI FUE UN EMPATE
         let game = connect4.initGame()
@@ -128,7 +128,7 @@ const tests = [
         game.addColor(COLUMN_7);game.changeTurn();
         game.addColor(COLUMN_7);game.changeTurn();
         game.addColor(COLUMN_7);
-        return game.isTied();
+        return game.isComplete();
     }
 ]
 

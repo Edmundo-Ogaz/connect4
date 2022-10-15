@@ -268,23 +268,7 @@ class BoardView {
   }
 }
 
-class CPUView {
-
-  constructor(game) {
-    this.game = game;
-  }
-
-  putToken() {
-    let column;
-    do {
-      console.writeln(`--------------------------`);
-      column = parseInt(Math.random() * 7);
-    } while (!Coordinate.isColumnValid(column) || this.game.isComplete(column));
-    this.game.dropToken(column);
-  }
-}
-
-class HumanView {
+class PlayerView {
 
   constructor(game) {
     this.game = game;
@@ -309,15 +293,28 @@ class HumanView {
     this.game.dropToken(column);
   }
 }
+class CPUView extends PlayerView {
 
+  constructor(game) {
+    super(game);
+  }
+
+  putToken() {
+    let column;
+    do {
+      console.writeln(`--------------------------`);
+      column = parseInt(Math.random() * 7);
+    } while (!Coordinate.isColumnValid(column) || this.game.isComplete(column));
+    this.game.dropToken(column);
+  }
+}
 class GameModeView {
 
   constructor(game) {
-    this.cpuView = new CPUView(game);
-    this.humanView = new HumanView(game);
+    this.game = game;
   }
 
-  getPlayers() {
+  readPlayers() {
     let response;
     let error = false;
     do {
@@ -329,7 +326,7 @@ class GameModeView {
     } while (error);
     let players = []
     for (let i = 0; i < Turn.NUMBER_PLAYERS; i++) {
-      players[i] = (i < response) ? this.humanView : this.cpuView;
+      players[i] = (i < response) ? new PlayerView(this.game) : new CPUView(this.game);
     }
     return players;
   }
@@ -343,19 +340,17 @@ class GameView {
 
   constructor() {
     this.game = new Game();;
-    //this.humanView = new HumanView(this.game);
     this.gameModeView = new GameModeView(this.game);
     this.boardView = new BoardView(this.game.getBoard());
   }
 
   play() {
     console.writeln(`----- CONNECT4 -----`);
-    const players = this.gameModeView.getPlayers();
+    const players = this.gameModeView.readPlayers();
     this.boardView.show();
     let gameFinished;
     do {
       players[this.game.getCurrentTurn()].putToken();
-      //this.humanView.putToken();
       this.boardView.show();
       gameFinished = this.game.isFinished();
       if (!gameFinished) {

@@ -120,14 +120,13 @@ class Player {
 
 class Turn {
 
-  static #NUMBER_PLAYERS = 2;
+  static NUMBER_PLAYERS = 2;
   #currentTurn;
-  COLORS = ["R", "Y"];
   #players = [];
 
   constructor() {
     this.#currentTurn = 0;
-    for (let i = 0; i < Turn.#NUMBER_PLAYERS; i++) {
+    for (let i = 0; i < Turn.NUMBER_PLAYERS; i++) {
       this.#players[i] = new Player(Color.get(i));
     }
   }
@@ -137,7 +136,7 @@ class Turn {
   }
 
   changeTurn() {
-    this.#currentTurn = (this.#currentTurn + 1) % Turn.#NUMBER_PLAYERS;
+    this.#currentTurn = (this.#currentTurn + 1) % Turn.NUMBER_PLAYERS;
   }
 
   getCurrentTurn() {
@@ -234,7 +233,7 @@ class Game {
     this.turn.changeTurn();
   }
 
-  addColor(column) {
+  dropToken(column) {
     this.board.addColor(column, this.turn.getCurrentColor());
   }
 
@@ -281,11 +280,11 @@ class CPUView {
       console.writeln(`--------------------------`);
       column = parseInt(Math.random() * 7);
     } while (!Coordinate.isColumnValid(column) || this.game.isComplete(column));
-    this.game.addColor(column);
+    this.game.dropToken(column);
   }
 }
 
-class PlayerView {
+class HumanView {
 
   constructor(game) {
     this.game = game;
@@ -307,7 +306,7 @@ class PlayerView {
         }
       }
     } while (!valid);
-    this.game.addColor(column);
+    this.game.dropToken(column);
   }
 }
 
@@ -315,19 +314,28 @@ class GameModeView {
 
   constructor(game) {
     this.cpuView = new CPUView(game);
-    this.playerView = new PlayerView(game);
+    this.humanView = new HumanView(game);
   }
 
   getPlayers() {
     let response;
+    let error = false;
     do {
-      response = console.readNumber(`Tell me the number of players`);
-    } while (0 > response || response > 2);
-    let gameMode = [this.cpuView, this.cpuView]
-    for (let i = 0; i < response; i++) {
-      gameMode[i] = this.playerView;
+      response = console.readNumber(`Tell me the number of human players`);
+      error = !this.#isNumberPlayerValid(response)
+      if (error) {
+        console.writeln(`This number for ${response} human players is not correct`);
+      }
+    } while (error);
+    let players = []
+    for (let i = 0; i < Turn.NUMBER_PLAYERS; i++) {
+      players[i] = (i < response) ? this.humanView : this.cpuView;
     }
-    return gameMode;
+    return players;
+  }
+
+  #isNumberPlayerValid(numberOfPlayer) {
+    return 0 <= numberOfPlayer && numberOfPlayer <= Turn.NUMBER_PLAYERS;
   }
 }
 
@@ -335,19 +343,19 @@ class GameView {
 
   constructor() {
     this.game = new Game();;
-    //this.playerView = new PlayerView(game);
-    this.gameMode = new GameModeView(this.game);
+    //this.humanView = new HumanView(this.game);
+    this.gameModeView = new GameModeView(this.game);
     this.boardView = new BoardView(this.game.getBoard());
   }
 
   play() {
     console.writeln(`----- CONNECT4 -----`);
-    const players = this.gameMode.getPlayers();
+    const players = this.gameModeView.getPlayers();
     this.boardView.show();
     let gameFinished;
     do {
       players[this.game.getCurrentTurn()].putToken();
-      //this.playerView.putToken();
+      //this.humanView.putToken();
       this.boardView.show();
       gameFinished = this.game.isFinished();
       if (!gameFinished) {

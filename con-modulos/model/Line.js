@@ -1,27 +1,24 @@
-const { Coordinate } = require('./Coordinate');
+const { Direction } = require('./Direction');
 
 class Line {
 
-  constructor(initial, coordinateShift) {
-    this.LENGTH = 4;
-    this.coordenates = this.getCoordenates(initial, coordinateShift);
-    this.oppocite = this.getCoordenates(initial, new Coordinate(coordinateShift.x * -1, coordinateShift.y * -1));
-  }
+  static LENGTH = 4;
+  #coordinates;
 
-  getCoordenates(initial, coordinateShift) {
-    let coordenates = [new Coordinate(initial.x, initial.y)];
-    for (let i = 0; i < this.LENGTH - 1; i++) {
-      coordenates.push(coordenates[i].shift(coordinateShift));
+  constructor(initialCoordinate, direction) {
+    this.#coordinates = [initialCoordinate];
+    for (let i = 0; i < Line.LENGTH - 1; i++) {
+      this.#coordinates.push(this.#coordinates[i].getShifted(direction));
     }
-    return coordenates;
   }
 
-  getLine() {
-    return this.coordenates;
+  get(ordinal) {
+    return this.#coordinates[ordinal];
   }
 
-  getOppocite() {
-    return this.oppocite;
+  displaceOne(direction) {
+    this.#coordinates = this.#coordinates.map(coordinate => coordinate.getShifted(direction));
+    return this;
   }
 }
 

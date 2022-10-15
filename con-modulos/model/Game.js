@@ -6,36 +6,34 @@ class Game {
   constructor() {
     this.turn = new Turn();
     this.board = new Board();
-    this.currentCoordinate;
   }
 
   getBoard() {
     return this.board;
   }
 
-  getColor() {
-    return this.turn.getColor();
+  getCurrentColor() {
+    return this.turn.getCurrentColor();
   }
 
   changeTurn() {
     this.turn.changeTurn();
   }
 
-  addToken(coordinate) {
-    this.currentCoordinate = coordinate;
-    this.board.addToken(coordinate, this.turn.getColor());
+  addColor(column) {
+    this.board.addColor(column, this.turn.getCurrentColor());
   }
 
-  calculateRow(col) {
-    return this.board.calculateRow(col);
+  isComplete(column) {
+    return this.board.isComplete(column);
   }
 
   isWinner() {
-    return this.board.isWinner(this.currentCoordinate);
+    return this.board.isWinner();
   }
 
-  isTied() {
-    return this.turn.isFinished();
+  isFinished() {
+    return this.board.isWinner() || this.board.isComplete();
   }
 }
 

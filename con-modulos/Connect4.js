@@ -4,7 +4,7 @@ let { YesNoDialogView } = require('./view/YesNoDialogView');
 
 class Connect4 {
 
-  init() {
+  play() {
     const continueDialogView = new YesNoDialogView(`Do you want to continue? (yes/no)`);
     do {
       let game = new Game();

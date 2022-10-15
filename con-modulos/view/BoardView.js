@@ -9,12 +9,12 @@ class BoardView {
     this.board = board;
   }
 
-  showBoard() {
+  show() {
     console.writeln(`* 1 2 3 4 5 6 7`);
-    for (let row = Coordinate.MAX_ROWS - 1; row >= 0; row--) {
+    for (let row = Coordinate.NUMBER_ROWS - 1; row >= 0; row--) {
       console.write(`${row + 1} `);
-      for (let col = 0; col < Coordinate.MAX_COLUMNS; col++) {
-        console.write(`${this.board.getCell(new Coordinate(col, row)) || "_"},`);
+      for (let column = 0; column < Coordinate.NUMBER_COLUMNS; column++) {
+        console.write(`${this.board.getColor(new Coordinate(row, column)) || "_"},`);
       }
       console.writeln();
     }

@@ -14,17 +14,21 @@ class GameView {
 
   play() {
     console.writeln(`----- CONNECT4 -----`);
-    this.boardView.showBoard();
+    this.boardView.show();
     let gameFinished;
     do {
       this.playerView.putToken();
-      gameFinished = this.game.isWinner() || this.game.isTied();
+      this.boardView.show();
+      gameFinished = this.game.isFinished();
       if (!gameFinished) {
         this.game.changeTurn();
       }
-      this.boardView.showBoard();
     } while (!gameFinished);
-    console.writeln(this.game.isTied() ? `Tied Game` : `The winner is the player ${this.game.getColor()}`);
+    this.#showResult();
+  }
+
+  #showResult() {
+    console.writeln(this.game.isWinner() ? `The winner is the player ${this.game.getCurrentColor()}` : `Tied Game`);
   }
 }
 

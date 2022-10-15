@@ -137,11 +137,10 @@ let initBoard = function() {
       for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
         let line = initLine(currentCoordinate, DIRECTIONS[i]);
         isWinner = isConnect4(line);
-          for (let j = 0; !isWinner && j < initLine.LENGTH - 1; j++) {
-            line = line.displaceOne(DIRECTIONS[i].getOppocite());
-            isWinner = isConnect4(line);
-          } 
-            
+        for (let j = 0; !isWinner && j < initLine.LENGTH - 1; j++) {
+          line = line.displaceOne(DIRECTIONS[i].getOppocite());
+          isWinner = isConnect4(line);
+        }
       }
       return isWinner;
     }
@@ -179,7 +178,7 @@ let initGame = function() {
 
 let initPlayerView = function(game) {
   return {
-    putColor() {
+    putToken() {
       let column;
       let valid;
       do {
@@ -229,7 +228,7 @@ let initGameView = function(game) {
       boardView.show();
       let gameFinished;
       do {
-        playerView.putColor();
+        playerView.putToken();
         boardView.show();
         gameFinished = game.isFinished();
         if (!gameFinished) {

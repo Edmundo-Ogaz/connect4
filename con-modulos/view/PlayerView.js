@@ -10,22 +10,22 @@ class PlayerView {
   }
 
   putToken() {
-    let col, row;
-    let correctColumn = true;
+    let column;
+    let valid;
     do {
       console.writeln(`--------------------------`);
-      col = console.readNumber(`Player ${this.game.getColor()} Select column between (1 - 7)`);
-      row = this.game.calculateRow(col - 1);
-      if (1 > col || col > 7) {
-        console.writeln("Remember columns between 1 and 7");
-        correctColumn = false;
-      } else if (row === undefined) {
-        console.writeln("This column is full");
-        correctColumn = false;
+      column = console.readNumber(`Player ${this.game.getCurrentColor()} Select column between (1 - 7)`) - 1;
+      valid = Coordinate.isColumnValid(column);
+      if (!valid) {
+        console.writeln(`Remember columns between 1 and 7`);
+      } else {
+        valid = !this.game.isComplete(column)
+        if (!valid) {
+          console.writeln(`This column is full`);
+        }
       }
-    } while (!correctColumn);
-
-    this.game.addToken(new Coordinate(col - 1, row));
+    } while (!valid);
+    this.game.addColor(column);
   }
 }
 

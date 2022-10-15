@@ -1,26 +1,25 @@
+const { Player } = require('./Player');
+const { Color } = require('./Color');
 class Turn {
 
+  static #NUMBER_PLAYERS = 2;
+  #activePlayer;
+  COLORS = ["R", "Y"];
+  #players = [];
+  
   constructor() {
-    this.numberOfTurns = 0;
-    this.MAX_TURNS = 42;
-    this.PLAYER_1 = "X";
-    this.COLORS = ["R", "Y"];
+    this.#activePlayer = 0;
+    for (let i = 0; i < Turn.#NUMBER_PLAYERS; i++) {
+      this.#players[i] = new Player(Color.get(i));
+    }
   }
 
-  getTurn() {
-    return this.numberOfTurns % 2;
-  }
-
-  getColor() {
-    return this.COLORS[this.getTurn()];
+  getCurrentColor() {
+    return this.#players[this.#activePlayer].getColor();
   }
 
   changeTurn() {
-    this.numberOfTurns++;
-  }
-
-  isFinished() {
-    return this.numberOfTurns === this.MAX_TURNS - 1;
+    this.#activePlayer = (this.#activePlayer + 1) %  Turn.#NUMBER_PLAYERS;
   }
 }
 

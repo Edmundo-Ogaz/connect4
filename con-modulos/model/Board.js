@@ -1,52 +1,67 @@
 const { Line } = require('./Line');
+const { Direction } = require('./Direction');
 const { Coordinate } = require('./Coordinate');
 class Board {
+  
+  currentCoordinate;
 
   constructor() {
+    this.cells = Array.from(Array(Coordinate.NUMBER_ROWS), () => Array(Coordinate.NUMBER_COLUMNS));
     this.EMPTY_CELL = undefined;
-    this.cells = Array.from(Array(Coordinate.MAX_ROWS), () => Array(Coordinate.MAX_COLUMNS));
-    this.TOKENS_CONNECTED_FOR_WIN = 4;
   }
 
-  getCell(coordinate) {
-    if (0 > coordinate.y || coordinate.y >= Coordinate.MAX_ROWS) {
-      return undefined;
-    }
-    return this.cells[coordinate.y][coordinate.x];
-  }
-
-  isConnect4(direction) {
-    const TOKEN = this.getCell(direction[0]);
-    for (let i = 1; i < this.TOKENS_CONNECTED_FOR_WIN; i++) {
-      if (this.getCell(direction[i]) !== TOKEN) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  calculateRow(col) {
-    for (let row = 0; row < this.cells.length - 1; row++) {
-      if (this.cells[row][col] === this.EMPTY_CELL) {
+  #calculateRow(column) {
+    for (let row = 0; row < this.cells.length; row++) {
+      if (this.cells[row][column] === this.EMPTY_CELL) {
         return row;
       }
     }
   }
 
-  addToken(coordinate, color) {
-    this.cells[coordinate.y][coordinate.x] = color;
+  #isConnect4(line) {
+    const COLOR = this.getColor(line.get(0));
+    for (let i = 1; i < Line.LENGTH; i++) {
+      if (this.getColor(line.get(i)) !== COLOR) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  getColor(coordinate) {
+    if (Coordinate.isRowValid(coordinate.getRow())) {
+      return this.cells[coordinate.getRow()][coordinate.getColumn()];
+    }
   }
 
-  isWinner(currentCoordinate) {
-    const SOUTH = new Line(currentCoordinate, new Coordinate(0, -1));
-    const WEST = new Line(currentCoordinate, new Coordinate(-1, 0));
-    const SOUTH_WEST = new Line(currentCoordinate, new Coordinate(-1, -1));
-    const NORTH_WEST = new Line(currentCoordinate, new Coordinate(1, -1));
-    const DIRECTIONS = [SOUTH, WEST, SOUTH_WEST, NORTH_WEST];
+  addColor(column, color) {
+    const row = this.#calculateRow(column);
+    this.cells[row][column] = color;
+    this.currentCoordinate = new Coordinate(row, column);
+  }
+
+  isComplete(column) {
+    if (column !== undefined) {
+      return this.cells[Coordinate.NUMBER_ROWS - 1][column] !== this.EMPTY_CELL;
+    }
+    for (let i = 0; i < Coordinate.NUMBER_COLUMNS; i++) {
+        if (!this.isComplete(i)) {
+            return false;
+        }
+    }
+    return true;
+  }
+
+  isWinner() {
+    const DIRECTIONS = Direction.VALUES;
     let isWinner = false;
     for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
-      isWinner = this.isConnect4(DIRECTIONS[i].getLine())
-        || this.isConnect4(DIRECTIONS[i].getOppocite());;
+      let line = new Line(this.currentCoordinate, DIRECTIONS[i]);
+      isWinner = this.#isConnect4(line);
+      for (let j = 0; !isWinner && j < Line.LENGTH - 1; j++) {
+        line = line.displaceOne(DIRECTIONS[i].getOppocite());
+        isWinner = this.#isConnect4(line);
+      }
     }
     return isWinner;
   }

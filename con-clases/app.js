@@ -87,13 +87,12 @@ class Line {
     }
   }
 
-  get(ordinal) {
+  getCoordinate(ordinal) {
     return this.#coordinates[ordinal];
   }
 
-  displaceOne(direction) {
+  shiftOne(direction) {
     this.#coordinates = this.#coordinates.map(coordinate => coordinate.getShifted(direction));
-    return this;
   }
 }
 
@@ -115,9 +114,9 @@ class Board {
   }
 
   #isConnect4(line) {
-    const COLOR = this.getColor(line.get(0));
+    const COLOR = this.getColor(line.getCoordinate(0));
     for (let i = 1; i < Line.LENGTH; i++) {
-      if (this.getColor(line.get(i)) !== COLOR) {
+      if (this.getColor(line.getCoordinate(i)) !== COLOR) {
         return false;
       }
     }
@@ -155,7 +154,7 @@ class Board {
       let line = new Line(this.currentCoordinate, DIRECTIONS[i]);
       isWinner = this.#isConnect4(line);
       for (let j = 0; !isWinner && j < Line.LENGTH - 1; j++) {
-        line = line.displaceOne(DIRECTIONS[i].getOppocite());
+        line.shiftOne(DIRECTIONS[i].getOppocite());
         isWinner = this.#isConnect4(line);
       }
     }
@@ -209,16 +208,52 @@ class Player {
   }
 }
 
+class Human extends Player {
+
+  constructor(color, board) {
+    super(color, board);
+  }
+
+  dropToken(column) {
+    if (!Coordinate.isColumnValid(column)) {
+      return `Remember columns between 1 and 7`;
+    } else if (super.isComplete(column)) {
+      return `This column is full`;
+    }
+    super.dropToken(column);
+  }
+}
+
+class Random extends Player {
+
+  constructor(color, board) {
+    super(color, board);
+  }
+
+  dropToken() {
+    let column;
+    do {
+      column = parseInt(Math.random() * 7);
+    } while (super.isComplete(column));
+    super.dropToken(column);
+  }
+}
+
 class Turn {
 
   static NUMBER_PLAYERS = 2;
   #currentTurn;
   #players = [];
+  #board;
 
   constructor(board) {
     this.#currentTurn = 0;
-    for (let i = 0; i < Turn.NUMBER_PLAYERS; i++) {
-      this.#players[i] = new Player(Color.get(i), board);
+    this.#board = board;
+  }
+
+  setPlayers(players) {
+    for (let i = 0; i < players.length; i++) {
+      this.#players[i] = new players[i](Color.get(i), this.#board);
     }
   }
 
@@ -285,45 +320,34 @@ class BoardView {
   }
 }
 
-class PlayerView {
+class HumanView {
 
-  constructor(player) {
-    this.player = player;
+  constructor(turn) {
+    this.turn = turn;
   }
 
-  putToken() {
-    let column;
-    let valid;
+  dropToken() {
+    let error;
     do {
       console.writeln(`--------------------------`);
-      column = console.readNumber(`Player ${this.player.getColor()} Select column between (1 - 7)`) - 1;
-      valid = Coordinate.isColumnValid(column);
-      if (!valid) {
-        console.writeln(`Remember columns between 1 and 7`);
-      } else {
-        valid = !this.player.isComplete(column)
-        if (!valid) {
-          console.writeln(`This column is full`);
-        }
+      let column = console.readNumber(`Player ${this.turn.getCurrentPlayer().getColor()} Select column between (1 - 7)`) - 1;
+      error = this.turn.getCurrentPlayer().dropToken(column);
+      if (error) {
+        console.writeln(error);
       }
-    } while (!valid);
-    this.player.dropToken(column);
+    } while (error);
   }
 }
 
-class CPUView {
+class RandomView {
 
-  constructor(player) {
-    this.player = player;
+  constructor(turn) {
+    this.turn = turn;
   }
 
-  putToken() {
-    let column;
-    do {
-      console.writeln(`--------------------------`);
-      column = parseInt(Math.random() * 7);
-    } while (!Coordinate.isColumnValid(column) || this.player.isComplete(column));
-    this.player.dropToken(column);
+  dropToken() {
+    console.writeln(`--------------------------`);
+    this.turn.getCurrentPlayer().dropToken();
   }
 }
 
@@ -348,14 +372,16 @@ class TurnView {
         console.writeln(`This game mode ${response} doesn´t exist`);
       }
     } while (error);
+    let players = [];
     for (let i = 0; i < Turn.NUMBER_PLAYERS; i++) {
-      this.#playersView[i] = (i < response) ? PlayerView : CPUView;
+      this.#playersView[i] = (i < response) ? new HumanView(this.#turn) : new RandomView(this.#turn);
+      players[i] = (i < response) ? Human : Random;
     }
+    this.#turn.setPlayers(players)
   }
 
   play() {
-    let playerView = this.#playersView[this.#turn.getCurrentTurn()];
-    new playerView(this.#turn.getCurrentPlayer()).putToken();
+    this.#playersView[this.#turn.getCurrentTurn()].dropToken();
   }
 
   #isModeGameValid(option) {
@@ -367,8 +393,8 @@ class GameView {
 
   constructor() {
     this.game = new Game();;
-    this.turnView = new TurnView(this.game.getTurn());
     this.boardView = new BoardView(this.game.getBoard());
+    this.turnView = new TurnView(this.game.getTurn());
   }
 
   play() {

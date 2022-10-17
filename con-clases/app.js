@@ -46,20 +46,32 @@ class Coordinate {
   }
 }
 
-class Direction extends Coordinate {
+class Direction {
 
   static SOUTH = new Direction(-1, 0);
   static WEST = new Direction(0, -1);
   static SOUTH_WEST = new Direction(-1, -1);
   static NORTH_WEST = new Direction(1, -1);
-  static VALUES = [Direction.SOUTH, Direction.WEST, Direction.SOUTH_WEST, Direction.NORTH_WEST];
 
   constructor(row, column) {
-    super(row, column)
+    this.row = row;
+    this.column = column;
+  }
+
+  getRow() {
+    return this.row;
+  }
+
+  getColumn() {
+    return this.column;
   }
 
   getOppocite() {
     return new Direction(this.row * -1, this.column * -1);
+  }
+
+  static values() {
+    return [Direction.SOUTH, Direction.WEST, Direction.SOUTH_WEST, Direction.NORTH_WEST];
   }
 }
 
@@ -87,9 +99,8 @@ class Line {
 
 class Color {
 
-  static RED = new Color(`R`);
-  static YELLOW = new Color(`Y`);
-  static #values = [Color.RED, Color.YELLOW];
+  static RED = new Color(`RED`);
+  static YELLOW = new Color(`YELLOW`);
   #string;
 
   constructor(string) {
@@ -97,7 +108,11 @@ class Color {
   }
 
   static get(ordinal) {
-    return Color.#values[ordinal];
+    return Color.#values()[ordinal];
+  }
+
+  static #values() {
+    return [Color.RED, Color.YELLOW];
   }
 
   toString() {
@@ -131,8 +146,12 @@ class Turn {
     }
   }
 
-  getCurrentColor() {
+  getCurrentPlayer() {
     return this.#players[this.#currentTurn].getColor();
+  }
+
+  getCurrentToken() {
+    return this.#players[this.#currentTurn].getColor().charAt();
   }
 
   changeTurn() {
@@ -177,7 +196,7 @@ class Board {
     }
   }
 
-  addColor(column, color) {
+  dropToken(column, color) {
     const row = this.#calculateRow(column);
     this.cells[row][column] = color;
     this.currentCoordinate = new Coordinate(row, column);
@@ -196,7 +215,7 @@ class Board {
   }
 
   isWinner() {
-    const DIRECTIONS = Direction.VALUES;
+    const DIRECTIONS = Direction.values();
     let isWinner = false;
     for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
       let line = new Line(this.currentCoordinate, DIRECTIONS[i]);
@@ -221,8 +240,12 @@ class Game {
     return this.board;
   }
 
-  getCurrentColor() {
-    return this.turn.getCurrentColor();
+  getTurn() {
+    return this.turn;
+  }
+
+  getCurrentPlayer() {
+    return this.turn.getCurrentPlayer();
   }
 
   getCurrentTurn() {
@@ -231,14 +254,6 @@ class Game {
 
   changeTurn() {
     this.turn.changeTurn();
-  }
-
-  dropToken(column) {
-    this.board.addColor(column, this.turn.getCurrentColor());
-  }
-
-  isComplete(column) {
-    return this.board.isComplete(column);
   }
 
   isWinner() {
@@ -270,8 +285,9 @@ class BoardView {
 
 class PlayerView {
 
-  constructor(game) {
-    this.game = game;
+  constructor(board, turn) {
+    this.board = board;
+    this.turn = turn;
   }
 
   putToken() {
@@ -279,24 +295,24 @@ class PlayerView {
     let valid;
     do {
       console.writeln(`--------------------------`);
-      column = console.readNumber(`Player ${this.game.getCurrentColor()} Select column between (1 - 7)`) - 1;
+      column = console.readNumber(`Player ${this.turn.getCurrentPlayer()} Select column between (1 - 7)`) - 1;
       valid = Coordinate.isColumnValid(column);
       if (!valid) {
         console.writeln(`Remember columns between 1 and 7`);
       } else {
-        valid = !this.game.isComplete(column)
+        valid = !this.board.isComplete(column)
         if (!valid) {
           console.writeln(`This column is full`);
         }
       }
     } while (!valid);
-    this.game.dropToken(column);
+    this.board.dropToken(column, this.turn.getCurrentToken());
   }
 }
 class CPUView extends PlayerView {
 
-  constructor(game) {
-    super(game);
+  constructor(board, turn) {
+    super(board, turn);
   }
 
   putToken() {
@@ -304,14 +320,15 @@ class CPUView extends PlayerView {
     do {
       console.writeln(`--------------------------`);
       column = parseInt(Math.random() * 7);
-    } while (!Coordinate.isColumnValid(column) || this.game.isComplete(column));
-    this.game.dropToken(column);
+    } while (!Coordinate.isColumnValid(column) || this.board.isComplete(column));
+    this.board.dropToken(column, this.turn.getCurrentToken());
   }
 }
 class GameModeView {
 
   constructor(game) {
-    this.game = game;
+    this.board = game.getBoard();
+    this.turn = game.getTurn();
   }
 
   readPlayers() {
@@ -326,7 +343,7 @@ class GameModeView {
     } while (error);
     let players = []
     for (let i = 0; i < Turn.NUMBER_PLAYERS; i++) {
-      players[i] = (i < response) ? new PlayerView(this.game) : new CPUView(this.game);
+      players[i] = (i < response) ? new PlayerView(this.board, this.turn) : new CPUView(this.board, this.turn);
     }
     return players;
   }
@@ -361,7 +378,7 @@ class GameView {
   }
 
   #showResult() {
-    console.writeln(this.game.isWinner() ? `The winner is the player ${this.game.getCurrentColor()}` : `Tied Game`);
+    console.writeln(this.game.isWinner() ? `The winner is the player ${this.game.getCurrentPlayer()}` : `Tied Game`);
   }
 }
 
@@ -405,4 +422,7 @@ class Connect4 {
   }
 }
 
-module.exports.Connect4 = Connect4;
+new Connect4().play();
+
+module.exports.Game = Game;
+module.exports.Coordinate = Coordinate;

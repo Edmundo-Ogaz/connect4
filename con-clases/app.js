@@ -31,16 +31,16 @@ class Coordinate {
     this.#column = column;
   }
 
-  getRow() {
+  get row() {
     return this.#row;
   }
 
-  getColumn() {
+  get column() {
     return this.#column;
   }
 
   getShifted(coordinate) {
-    return new Coordinate(this.#row + coordinate.getRow(), this.#column + coordinate.getColumn());
+    return new Coordinate(this.#row + coordinate.row, this.#column + coordinate.column);
   }
 
   static isRowValid(row) {
@@ -69,7 +69,7 @@ class Direction {
   }
 
   getOppocite() {
-    return new Direction(this.#coordinate.getRow() * -1, this.#coordinate.getColumn() * -1);
+    return new Direction(this.#coordinate.row * -1, this.#coordinate.column * -1);
   }
 
   static values() {
@@ -127,8 +127,8 @@ class Board {
   }
 
   getColor(coordinate) {
-    if (Coordinate.isRowValid(coordinate.getRow())) {
-      return this.#cells[coordinate.getRow()][coordinate.getColumn()];
+    if (Coordinate.isRowValid(coordinate.row)) {
+      return this.#cells[coordinate.row][coordinate.column];
     }
   }
 
@@ -216,13 +216,13 @@ class Player {
 
 class Human extends Player {
 
-  constructor(color) {
-    super(color);
+  constructor(i) {
+    super(Color.get(i));
   }
 
   dropToken(column) {
     if (!Coordinate.isColumnValid(column)) 
-      return `Remember columns between 1 and 7`;
+      return `Remember columns between 1 and ${Coordinate.MAX_COLUMNS}`;
     if (this.isComplete(column)) 
       return `This column is full`;
     super.dropToken(column);
@@ -231,8 +231,8 @@ class Human extends Player {
 
 class Random extends Player {
 
-  constructor(color) {
-    super(color);
+  constructor(i) {
+    super(Color.get(i));
   }
 
   dropToken() {
@@ -352,7 +352,7 @@ class PlayerView {
 class HumanView extends PlayerView {
 
   constructor(i) {
-    super(new Human(Color.get(i)));
+    super(new Human(i));
   }
 
   dropToken() {
@@ -371,7 +371,7 @@ class HumanView extends PlayerView {
 class RandomView extends PlayerView {
 
   constructor(i) {
-    super(new Random(Color.get(i)));
+    super(new Random(i));
   }
 
   dropToken() {

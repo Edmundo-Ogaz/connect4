@@ -19,10 +19,10 @@ class ClosedInterval {
 
 class Coordinate {
 
-  static NUMBER_ROWS = 6;
-  static ROWS = new ClosedInterval(0, Coordinate.NUMBER_ROWS - 1);
-  static NUMBER_COLUMNS = 7;
-  static COLUMNS = new ClosedInterval(0, Coordinate.NUMBER_COLUMNS - 1);
+  static MAX_ROWS = 6;
+  static NUMBER_ROWS = new ClosedInterval(0, Coordinate.MAX_ROWS - 1);
+  static MAX_COLUMNS = 7;
+  static NUMBER_COLUMNS = new ClosedInterval(0, Coordinate.MAX_COLUMNS - 1);
   #row;
   #column;
 
@@ -44,11 +44,11 @@ class Coordinate {
   }
 
   static isRowValid(row) {
-    return Coordinate.ROWS.isIncluded(row);
+    return Coordinate.NUMBER_ROWS.isIncluded(row);
   }
   
   static isColumnValid(column) {
-    return Coordinate.COLUMNS.isIncluded(column);
+    return Coordinate.NUMBER_COLUMNS.isIncluded(column);
   }
 }
 
@@ -105,7 +105,7 @@ class Board {
   #currentCoordinate;
 
   constructor() {
-    this.#cells = Array.from(Array(Coordinate.NUMBER_ROWS), () => Array(Coordinate.NUMBER_COLUMNS));
+    this.#cells = Array.from(Array(Coordinate.MAX_ROWS), () => Array(Coordinate.MAX_COLUMNS));
   }
 
   #calculateRow(column) {
@@ -140,9 +140,9 @@ class Board {
 
   isComplete(column) {
     if (column !== undefined) {
-      return this.#cells[Coordinate.NUMBER_ROWS - 1][column] !== this.#EMPTY_CELL;
+      return this.#cells[Coordinate.MAX_ROWS - 1][column] !== this.#EMPTY_CELL;
     }
-    for (let i = 0; i < Coordinate.NUMBER_COLUMNS; i++) {
+    for (let i = 0; i < Coordinate.MAX_COLUMNS; i++) {
       if (!this.isComplete(i)) {
         return false;
       }
@@ -223,7 +223,7 @@ class Human extends Player {
   dropToken(column) {
     if (!Coordinate.isColumnValid(column)) 
       return `Remember columns between 1 and 7`;
-    if (super.isComplete(column)) 
+    if (this.isComplete(column)) 
       return `This column is full`;
     super.dropToken(column);
   }
@@ -238,8 +238,8 @@ class Random extends Player {
   dropToken() {
     let column;
     do {
-      column = parseInt(Math.random() * 7);
-    } while (super.isComplete(column));
+      column = parseInt(Math.random() * Coordinate.MAX_COLUMNS);
+    } while (this.isComplete(column));
     super.dropToken(column);
   }
 }
@@ -323,9 +323,9 @@ class BoardView {
 
   writeln() {
     console.writeln(`* 1 2 3 4 5 6 7`);
-    for (let row = Coordinate.NUMBER_ROWS - 1; row >= 0; row--) {
+    for (let row = Coordinate.MAX_ROWS - 1; row >= 0; row--) {
       console.write(`${row + 1} `);
-      for (let column = 0; column < Coordinate.NUMBER_COLUMNS; column++) {
+      for (let column = 0; column < Coordinate.MAX_COLUMNS; column++) {
         console.write(`${this.#board.getColor(new Coordinate(row, column)) || "_"},`);
       }
       console.writeln();
@@ -335,27 +335,31 @@ class BoardView {
 
 class PlayerView {
 
-  player;
+  #player;
   constructor(player) {
-    this.player = player;
+    this.#player = player;
   }
 
   writeTitle() {
     console.writeln(`--------------------------`);
   }
+
+  get player() {
+    return this.#player;
+  }
 }
 
 class HumanView extends PlayerView {
 
-  constructor(player) {
-    super(player);
+  constructor(i) {
+    super(new Human(Color.get(i)));
   }
 
   dropToken() {
     let error;
     do {
       this.writeTitle();
-      let column = console.readNumber(`Player ${this.player.getColor()} Select column between (1 - 7)`) - 1;
+      let column = console.readNumber(`Player ${this.player.getColor()} Select column between (1 - ${Coordinate.MAX_COLUMNS})`) - 1;
       error = this.player.dropToken(column);
       if (error) {
         console.writeln(error);
@@ -366,8 +370,8 @@ class HumanView extends PlayerView {
 
 class RandomView extends PlayerView {
 
-  constructor(player) {
-    super(player);
+  constructor(i) {
+    super(new Random(Color.get(i)));
   }
 
   dropToken() {
@@ -385,20 +389,24 @@ class TurnView {
     this.#turn = turn;
   }
 
-  config() {
-    let response;
+  configure() {
+    let humanPlayers;
     let error = false;
     do {
-      response = console.readNumber(`Tell me the number of human players (until 2)`);
-      error = !Turn.isNumberPlayerValid(response)
+      humanPlayers = console.readNumber(`Tell me the number of human players (until 2)`);
+      error = !Turn.isNumberPlayerValid(humanPlayers)
       if (error) {
-        console.writeln(`This number of human players ${response} is not valid`);
+        console.writeln(`This number of human players is not valid!`);
       }
     } while (error);
+    this.#buildPlayers(humanPlayers);
+  }
+
+  #buildPlayers(humanPlayers) {
     for (let i = 0; i < Turn.MAX_PLAYERS; i++) {
-      const player = (i < response) ? new Human(Color.get(i)) : new Random(Color.get(i));
-      this.#turn.addPlayer(player);
-      this.#playersView.push((player instanceof Human) ? new HumanView(player) : new RandomView(player));
+      const playerView = (i < humanPlayers) ? new HumanView(i) : new RandomView(i);
+      this.#turn.addPlayer(playerView.player);
+      this.#playersView.push(playerView);
     }
   }
 
@@ -413,15 +421,15 @@ class GameView {
   #boardView;
   #turnView;
 
-  constructor() {
-    this.#game = new Game();;
+  constructor(game) {
+    this.#game = game;
     this.#boardView = new BoardView(this.#game.getBoard());
     this.#turnView = new TurnView(this.#game.getTurn());
   }
 
   play() {
     console.writeln(`----- CONNECT4 -----`);
-    this.#turnView.config();
+    this.#turnView.configure();
     let gameFinished;
     do {
       this.#boardView.writeln();
@@ -469,18 +477,18 @@ class YesNoDialogView {
   }
 }
 
-class Connect4View {
+class Connect4 {
 
   play() {
     const continueDialogView = new YesNoDialogView(`Do you want to continue? (yes/no)`);
     do {
-      new GameView().play();
+      new GameView(new Game()).play();
       continueDialogView.read();
     } while (continueDialogView.isAffirmative());
   }
 }
 
-new Connect4View().play();
+new Connect4().play();
 
 module.exports.Game = Game;
 module.exports.Coordinate = Coordinate;

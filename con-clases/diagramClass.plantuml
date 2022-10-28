@@ -21,7 +21,7 @@ TurnView ..> PlayerView
 TurnView : + config()
 TurnView : + play()
 
-PlayerView : + turn
+PlayerView *--> Player
 PlayerView : + writeTitle()
 PlayerView <|-- RandomView
 PlayerView <|-- HumanView
@@ -104,10 +104,10 @@ Direction : + getCoordinate()
 Direction : + getOppocite()
 Direction : + {static} values()
 
+Coordinate : + {static} MAX_ROWS
 Coordinate : + {static} NUMBER_ROWS
-Coordinate : + {static} ROWS
+Coordinate : + {static} MAX_COLUMNS
 Coordinate : + {static} NUMBER_COLUMNS
-Coordinate : + {static} COLUMNS
 Coordinate : - row
 Coordinate : - column
 Coordinate : + getRow()

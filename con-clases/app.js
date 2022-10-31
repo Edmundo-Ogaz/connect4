@@ -399,10 +399,10 @@ class TurnView {
         console.writeln(`This number of human players is not valid!`);
       }
     } while (error);
-    this.#buildPlayers(humanPlayers);
+    this.#createPlayers(humanPlayers);
   }
 
-  #buildPlayers(humanPlayers) {
+  #createPlayers(humanPlayers) {
     for (let i = 0; i < Turn.MAX_PLAYERS; i++) {
       const playerView = (i < humanPlayers) ? new HumanView(i) : new RandomView(i);
       this.#turn.addPlayer(playerView.player);

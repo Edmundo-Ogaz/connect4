@@ -193,8 +193,11 @@ class Player {
   #color;
   #board;
 
-  constructor(color, board) {
+  constructor(color) {
     this.#color = color;
+  }
+
+  set board(board) {
     this.#board = board;
   }
 
@@ -213,8 +216,8 @@ class Player {
 
 class Human extends Player {
 
-  constructor(i, board) {
-    super(Color.get(i), board);
+  constructor(i) {
+    super(Color.get(i));
   }
 
   dropToken(column) {
@@ -224,16 +227,12 @@ class Human extends Player {
       return `This column is full`;
     super.dropToken(column);
   }
-
-  accept(playerView) {
-    playerView.visitHuman(this)
-  }
 }
 
 class Random extends Player {
 
-  constructor(i, board) {
-    super(Color.get(i), board);
+  constructor(i) {
+    super(Color.get(i));
   }
 
   dropToken() {
@@ -242,10 +241,6 @@ class Random extends Player {
       column = parseInt(Math.random() * Coordinate.MAX_COLUMNS);
     } while (this.isComplete(column));
     super.dropToken(column);
-  }
-
-  accept(playerView) {
-    playerView.visitRandom(this)
   }
 }
 
@@ -261,11 +256,9 @@ class Turn {
     this.#board = board;
   }
 
-  createPlayers(humanPlayers) {
-    for (let i = 0; i < Turn.MAX_PLAYERS; i++) {
-      const player = (i < humanPlayers) ? new Human(i, this.#board) : new Random(i, this.#board);
-      this.#players.push(player);
-    }
+  addPlayer(player) {
+    player.board = this.#board;
+    this.#players.push(player);
   }
 
   getCurrentPlayer() {
@@ -274,6 +267,10 @@ class Turn {
 
   changeTurn() {
     this.#currentTurn = (this.#currentTurn + 1) % Turn.MAX_PLAYERS;
+  }
+
+  getCurrentTurn() {
+    return this.#currentTurn;
   }
 
   static isNumberPlayerValid(number) {
@@ -338,36 +335,55 @@ class BoardView {
 
 class PlayerView {
 
-  receive(player) {
-    player.accept(this);
+  #player;
+  constructor(player) {
+    this.#player = player;
   }
 
-  visitRandom(randow) {
-    this.#writeTitle();
-    randow.dropToken();
+  writeTitle() {
+    console.writeln(`--------------------------`);
   }
 
-  visitHuman(human) {
+  get player() {
+    return this.#player;
+  }
+}
+
+class HumanView extends PlayerView {
+
+  constructor(i) {
+    super(new Human(i));
+  }
+
+  dropToken() {
     let error;
     do {
-      this.#writeTitle();
-      let column = console.readNumber(`Player ${human.getColor()} Select column between (1 - ${Coordinate.MAX_COLUMNS})`) - 1;
-      error = human.dropToken(column);
+      this.writeTitle();
+      let column = console.readNumber(`Player ${this.player.getColor()} Select column between (1 - ${Coordinate.MAX_COLUMNS})`) - 1;
+      error = this.player.dropToken(column);
       if (error) {
         console.writeln(error);
       }
     } while (error);
   }
+}
 
-  #writeTitle() {
-    console.writeln(`--------------------------`);
+class RandomView extends PlayerView {
+
+  constructor(i) {
+    super(new Random(i));
+  }
+
+  dropToken() {
+    this.writeTitle();
+    this.player.dropToken();
   }
 }
 
 class TurnView {
 
   #turn;
-  #playerView = new PlayerView()
+  #playersView = [];
 
   constructor(turn) {
     this.#turn = turn;
@@ -383,11 +399,19 @@ class TurnView {
         console.writeln(`This number of human players is not valid!`);
       }
     } while (error);
-    this.#turn.createPlayers(humanPlayers);
+    this.#createPlayers(humanPlayers);
+  }
+
+  #createPlayers(humanPlayers) {
+    for (let i = 0; i < Turn.MAX_PLAYERS; i++) {
+      const playerView = (i < humanPlayers) ? new HumanView(i) : new RandomView(i);
+      this.#turn.addPlayer(playerView.player);
+      this.#playersView.push(playerView);
+    }
   }
 
   play() {
-    this.#playerView.receive(this.#turn.getCurrentPlayer());
+    this.#playersView[this.#turn.getCurrentTurn()].dropToken();
   }
 }
 

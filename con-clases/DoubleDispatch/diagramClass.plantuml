@@ -1,0 +1,149 @@
+@startuml
+Connect4View ..> YesNoDialogView
+Connect4View ..> GameView
+Connect4View : + play()
+
+YesNoDialogView : - question
+YesNoDialogView : - answer
+YesNoDialogView : -constructor(question)
+YesNoDialogView : + read()
+YesNoDialogView : + isAffirmative()
+YesNoDialogView : + isNegative()
+
+GameView : - game
+GameView : - turnView
+GameView : - boardView
+GameView : - constructor(game)
+GameView : - writeResult()
+GameView : + play()
+GameView *--> Game
+GameView *--> TurnView
+GameView *--> BoardView
+
+TurnView : - turn
+TurnView : - playerView
+TurnView *--> Turn
+TurnView *--> PlayerView
+TurnView : - constructor(turn)
+TurnView : + configure()
+TurnView : + play()
+
+PlayerView : + receive(player)
+PlayerView : + visitRandom(randow)
+PlayerView : + visitHuman(human)
+PlayerView : - writeTitle()
+PlayerView ..> Player
+
+BoardView : - board
+BoardView : - constructor(board)
+BoardView : + writeln()
+BoardView *--> Board
+BoardView ..> Coordinate
+
+Game : - board
+Game : - turn
+Game *--> Board
+Game *--> Turn
+Game : - constructor()
+Game : + getBoard()
+Game : + getTurn()
+Game : + getCurrentPlayer()
+Game : + changeTurn()
+Game : + isWinner()
+Game : + isFinished()
+
+Turn : + {static} MAX_PLAYERS
+Turn : + {static} NUMBER_PLAYER
+Turn : - currentTurn
+Turn : - players
+Turn : - board
+Turn *--> Player
+Turn *--> Board
+Turn : - constructor(board)
+Turn : + createPlayers(humanPlayers)
+Turn : + getCurrentPlayer()
+Turn : + changeTurn()
+Turn : + {static} isNumberPlayerValid(number)
+Turn ..>  ClosedInterval
+
+Player : - color
+Player : - board
+Player *--> Color
+Player *--> Board
+Player : - constructor(color, board)
+Player : + getColor()
+Player : + isComplete(column)
+Player : + dropToken(column)
+Player <|-- Human
+Player <|-- Random
+Player ..> PlayerView
+
+Human : - constructor(i, board)
+Human : + dropToken(column)
+Human : + accept(playerView)
+
+Random : - constructor(i, board)
+Random : + dropToken()
+Random : + accept(playerView)
+
+Color : + {static} RED
+Color : + {static} YELLOW
+Color : - string
+Color : - constructor(string)
+Color : + toString()
+Color : + {static} get(ordinal)
+Color : - {static} values()
+
+Board : - EMPTY_CELL
+Board : - cells
+Board : - currentCoordinate
+Board ..> Line
+Board ..> Direction
+Board ..> Coordinate
+Board : - constructor()
+Board : - calculateRow(column)
+Board : - isConnect4(line)
+Board : + getColor(coordinate)
+Board : + dropToken(column, color)
+Board : + isComplete(column)
+Board : + isWinner()
+
+Line : + {static} LENGTH
+Line *--> Coordinate
+Line ..> Direction
+Line : - coordenates
+Line : - constructor(initialCoordinate, direction)
+Line : + getCoordinate(ordinal)
+Line : + shiftOne(direction)
+
+Direction : + {static} SOUTH
+Direction : + {static} WEST
+Direction : + {static} SOUTH_WEST
+Direction : + {static} NORTH_WEST
+Direction : - coordinate
+Direction *--> Coordinate
+Direction : - constructor(row, column)
+Direction : + getCoordinate() 
+Direction : + getOppocite()
+Direction : + {static} values()
+
+Coordinate : + {static} MAX_ROWS
+Coordinate : + {static} NUMBER_ROWS
+Coordinate : + {static} MAX_COLUMNS
+Coordinate : + {static} NUMBER_COLUMNS
+Coordinate : - row
+Coordinate : - column
+Coordinate : - constructor(row, column)
+Coordinate : + getRow()
+Coordinate : + getColumn()
+Coordinate : + getShifted(coordinate)
+Coordinate : + {static} isRowValid(row)
+Coordinate : + {static} isColumnValid(column)
+Coordinate ..>  ClosedInterval
+
+ClosedInterval : - min
+ClosedInterval : - max
+ClosedInterval : - constructor(min, max)
+ClosedInterval : + isIncluded(value)
+
+@enduml

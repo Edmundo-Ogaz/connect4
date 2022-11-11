@@ -175,6 +175,10 @@ class Color {
     this.#string = string;
   }
 
+  toString() {
+    return this.#string;
+  }
+
   static get(ordinal) {
     return Color.#values()[ordinal];
   }
@@ -183,9 +187,6 @@ class Color {
     return [Color.RED, Color.YELLOW];
   }
 
-  toString() {
-    return this.#string;
-  }
 }
 
 class Player {

@@ -336,6 +336,7 @@ class BoardView {
 class PlayerView {
 
   #player;
+  
   constructor(player) {
     this.#player = player;
   }
@@ -383,10 +384,11 @@ class RandomView extends PlayerView {
 class TurnView {
 
   #turn;
-  #playersView = [];
+  #playersView;
 
   constructor(turn) {
     this.#turn = turn;
+    this.#playersView = [];
   }
 
   configure() {

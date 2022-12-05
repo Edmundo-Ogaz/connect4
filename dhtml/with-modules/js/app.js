@@ -1,4 +1,4 @@
-import { GameView } from "./js/DoubleDispatch/view/GameView.js";
+import { GameView } from "./DoubleDispatch/view/GameView.js";
 
 const gameView = new GameView();
 gameView.newGame();

@@ -8,16 +8,14 @@
     <meta name="description" content="Connect4 Free Online Game">
     <meta name="author" content="lab-boole">
     <title>Connect4 Game</title>
-    <!-- <link rel="stylesheet" href="css/app-experimental.css"> -->
     <link rel="stylesheet" href="css/app.css">
-    <!-- <script type="text/javascript" src="js/DoubleDispatch/model/Game.js"></script> -->
-    <!-- <script type="text/javascript" src="js/DoubleDispatch/model/model.js"></script> -->
     <script type="text/javascript" src="js/DoubleDispatch/view/view.js"></script>
     <script type="text/javascript" src="js/DoubleDispatch/model/model.js"></script>
+    <script type="text/javascript" src="js/DoubleDispatch/utils/assert.js"></script>
 </head>
 
 <body class="body">
-    <div class="game">
+    <div class="app">
         <header class="header col-3">
             <h1 class="header__logo">Connect<span class="header__logo__span">4</span></h1>
         </header>
@@ -55,6 +53,7 @@
         <main class="board__wrapper">
             <div class="board">
                 <div id="column-0" class="board__column" onclick="dropToken(0)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-05" class="board__cell">
                         <input id="checker-05" type="checkbox" class="board__input" name="checker-05" disabled>
                         <label for="checker-05" class="board__checker"></label>
@@ -81,6 +80,7 @@
                     </div>
                 </div>
                 <div id="column-1" class="board__column" onclick="dropToken(1)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-15" class="board__cell">
                         <input id="checker-15" type="checkbox" class="board__input" name="checker-15" disabled>
                         <label for="checker-15" class="board__checker"></label>
@@ -107,6 +107,7 @@
                     </div>
                 </div>
                 <div id="column-2" class="board__column" onclick="dropToken(2)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-25" class="board__cell">
                         <input id="checker-25" type="checkbox" class="board__input" name="checker-25" disabled>
                         <label for="checker-25" class="board__checker"></label>
@@ -133,6 +134,7 @@
                     </div>
                 </div>
                 <div id="column-3" class="board__column" onclick="dropToken(3)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-35" class="board__cell">
                         <input id="checker-35" type="checkbox" class="board__input" name="checker-35" disabled>
                         <label for="checker-35" class="board__checker"></label>
@@ -159,6 +161,7 @@
                     </div>
                 </div>
                 <div id="column-4" class="board__column" onclick="dropToken(4)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-45" class="board__cell">
                         <input id="checker-45" type="checkbox" class="board__input" name="checker-45" disabled>
                         <label for="checker-45" class="board__checker"></label>
@@ -185,6 +188,7 @@
                     </div>
                 </div>
                 <div id="column-5" class="board__column" onclick="dropToken(5)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-55" class="board__cell">
                         <input id="checker-55" type="checkbox" class="board__input" name="checker-55" disabled>
                         <label for="checker-55" class="board__checker"></label>
@@ -211,6 +215,7 @@
                     </div>
                 </div>
                 <div id="column-6" class="board__column" onclick="dropToken(6)">
+                    <!-- <div class="board__cell first-line"></div> -->
                     <div id="cell-65" class="board__cell">
                         <input id="checker-65" type="checkbox" class="board__input" name="checker-65" disabled>
                         <label for="checker-65" class="board__checker"></label>
@@ -244,15 +249,15 @@
                 </header>
 
                 <div class="players__wrapper">
-                    <div id="player-a" class="player player__has-turn   d-flex flex-column align-items-center">
+                    <div id="player-yellow" class="player   d-flex flex-column align-items-center">
                         <span class="player__checker player--yellow   d-flex align-items-center justify-content-center">Y</span>
-                        <p class="player__name">Michelangelo</p>
-                        <p class="player__id">Player A</p>
+                        <p class="player__name">YELLOW</p>
+                        <!-- <p class="player__id">Player YELLOW</p> -->
                     </div>
-                    <div id="player-b" class="player   d-flex flex-column align-items-center">
+                    <div id="player-red" class="player   d-flex flex-column align-items-center">
                         <span class="player__checker player--red   d-flex align-items-center justify-content-center">R</span>
-                        <p class="player__name">Leonardo</p>
-                        <p class="player__id">Player B</p>
+                        <p class="player__name">RED</p>
+                        <!-- <p class="player__id">Player RED</p> -->
                     </div>
                 </div>
             </aside>
@@ -297,7 +302,7 @@
 </body>
 <script>
     const connect4 = new GameView();
-    connect4.play();
+    connect4.newGame();
 
     const dropToken = function(column) {
         connect4.dropToken(column);
@@ -306,73 +311,6 @@
     const newGame = function(column) {
         connect4.newGame();
     }
-    // let game;
-    
-    // const dialogPlayers = document.getElementsByClassName('dialog__players')[0];
-    // dialogPlayers.addEventListener('close', () => {
-    //     console.log(dialogPlayers.returnValue);
-    //     const humanPlayers  = dialogPlayers.returnValue;
-    //     game = new Game(humanPlayers);
-    //     cleanBoard();
-    // });
-    // dialogPlayers.showModal();
-
-    // const dialogFinished = document.getElementsByClassName('dialog__finished')[0];
-    // dialogFinished.addEventListener('close', () => {
-    //     console.log(dialogFinished.returnValue);
-    //     newGame()
-    // });
-
-    // const newGame = function() {
-    //     dialogPlayers.showModal();
-    // }
-
-    // const dropToken = function(column) {
-    //     console.log(`dropToken ${column}`);
-    //     const currentPlayer = game.getTurn().getCurrentPlayer();
-    //     error = currentPlayer.dropToken(column);
-    //     if (error) {
-    //         console.log(error);
-    //     } else {
-    //         const currentCoordinate = game.getCurrentCoordinate();
-    //         console.log(`dropToken ${currentCoordinate.column} ${currentCoordinate.row}`);
-    //         const color = currentPlayer.getColor().toLowerCase();
-    //         console.log(`dropToken ${color}`);
-    //         const cell = document.getElementById(`cell-${currentCoordinate.column}${currentCoordinate.row}`);
-    //         cell.classList.add(`has-${color}`); 
-    //         const checker = document.getElementById(`checker-${currentCoordinate.column}${currentCoordinate.row}`);
-    //         checker.checked = true;
-    //         const gameFinished = game.isFinished();
-    //         if (!gameFinished) {
-    //             game.getTurn().changeTurn();
-    //         } else {
-    //             writeResult();
-    //         }
-    //     }
-    // }
-
-    // const writeResult = function() {
-    //     const title = document.getElementsByClassName('dialog__finished-title')[0];
-    //     let msg;
-    //     if (game.getBoard().isWinner()) {
-    //         msg = `The winner is the player ${game.getTurn().getCurrentPlayer().getColor()}`;
-    //     } else {
-    //         msg = `Tied Game`;
-    //     }
-    //     title.innerHTML = msg;
-    //     dialogFinished.showModal();
-    // }
-
-    // const cleanBoard = function() {
-    //     for(let column = 0; column < 7; column++) {
-    //         for(let row = 0; row < 6; row++) {
-    //             const cell = document.getElementById(`cell-${column}${row}`);
-    //             cell.className = 'board__cell';
-    //             const checker = document.getElementById(`checker-${column}${row}`);
-    //             checker.checked = false;
-    //         }
-    //     }
-    // }
 </script>
 
 </html>

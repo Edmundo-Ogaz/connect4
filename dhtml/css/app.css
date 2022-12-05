@@ -101,7 +101,7 @@ button {
 
 /* LAYOUT ---------------------------------------------------------*/
 
-.game {
+.app {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -222,17 +222,16 @@ button {
   box-shadow: inset 0 1px 4px 0 hsla(10, 90%, 20%, .5), inset 0 0 0 3px hsla(0, 0%, 0%, .07), 0 1px 1px 1px hsla(0, 100%, 100%, .2);
 }
 
-.board__column:hover {
+/* .board__column:hover {
   background-color: #2D353C;
-}
+} */
 
 .players__header--turn {
   margin-bottom: 12vh;
-  font-size: var(--font-size-4);
-  font-weight: normal;
+  font-size: var(--font-size-6);
+  font-weight: var(--font-weight-7);
   text-transform: uppercase;
   letter-spacing: var(--size-1);
-  color: var(--blue-1);
 }
 
 .player__checker {
@@ -379,7 +378,7 @@ button {
   opacity: 1;
 }
 
-dialog {
+.dialog__players {
   background: #3a445e;
     width: 300px;
     margin-right: auto;
@@ -390,20 +389,20 @@ dialog {
     border-radius: 10px;
 }
 
-dialog::backdrop {
+.dialog__players::backdrop {
   background-color: rgba(61,53,53,0.8);
 }
 
-dialog p {
+.dialog__players p {
   padding: 1rem;
     color: white;
 }
 
-dialog form {
+.dialog__players form {
   padding: 1rem;
 }
 
-dialog button {
+.dialog__players button {
   padding: .6rem;
   margin: .6rem;
   background: #0c1621;
@@ -411,6 +410,22 @@ dialog button {
   font-size: 12px;
   border-radius: 8px;
   font-weight: bold;
+}
+
+.board__column:hover {
+  background-color: skyblue;
+}
+
+.board__column::before {
+  content: "";
+  display: block;
+  height: .5rem;
+  width: 0;
+  background-color: black;
+}
+
+.board__column:hover::before {
+  width: 100%;
 }
 
 /* UTILITIES ---------------------------------------------------------*/

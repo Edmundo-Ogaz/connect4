@@ -114,6 +114,9 @@ class Board {
   }
 
   isWinner() {
+    if (this.#currentCoordinate === undefined) {
+      return false;
+    }
     for (let direction of Direction.values()) {
       let line = this.#getLine(this.#currentCoordinate, direction);
       for (let i = 0; i < Board.LINE_LENGTH; i++) {
@@ -159,8 +162,8 @@ class Board {
 
 class Color {
 
-  static RED = new Color(`RED`);
-  static YELLOW = new Color(`YELLOW`);
+  static RED = new Color(`red`);
+  static YELLOW = new Color(`yellow`);
   #string;
 
   constructor(string) {
@@ -176,7 +179,7 @@ class Color {
   }
 
   static #values() {
-    return [Color.RED, Color.YELLOW];
+    return [Color.YELLOW, Color.RED];
   }
 
 }
@@ -262,7 +265,7 @@ class Turn {
     return this.#players[this.#currentTurn];
   }
 
-  changeTurn() {
+  next() {
     if (!this.#board.isFinished()) {
       this.#currentTurn = (this.#currentTurn + 1) % Turn.MAX_PLAYERS;
     }
@@ -299,9 +302,6 @@ class Game {
     return this.#board.getCurrentCoordinate();
   }
 
-  changeTurn() {
-    this.#turn.changeTurn();
-  }
   isWinner() {
     return this.#board.isWinner();
   }

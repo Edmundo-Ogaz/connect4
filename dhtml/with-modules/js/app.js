@@ -3,25 +3,25 @@ import { GameView } from "./DoubleDispatch/view/GameView.js";
 const dialogPlayers = document.getElementsByClassName('dialog__players')[0];
 dialogPlayers.addEventListener('close', () => {
     const humanPlayers  = dialogPlayers.returnValue;
-    gameView.newGame(humanPlayers);
+    gameView.reset(humanPlayers);
 });
 
 const dialogFinished = document.getElementsByClassName('dialog__finished')[0];
 dialogFinished.addEventListener('close', () => {
     const response = dialogFinished.returnValue;
     if (response === 'yes') {
-        dialogPlayers.showModal();
+        gameView.newGame();
     }
 });
 
-const gameView = new GameView(dialogFinished);
+const gameView = new GameView(dialogPlayers, dialogFinished);
 
-dialogPlayers.showModal();
+gameView.newGame();
 
 window.dropToken = function(column) {
     gameView.dropToken(column);
 }
 
 window.newGame = function() {
-    dialogPlayers.showModal();
+    gameView.newGame();
 }

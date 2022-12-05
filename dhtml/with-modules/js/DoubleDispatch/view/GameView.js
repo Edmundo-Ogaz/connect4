@@ -10,13 +10,19 @@ export class GameView {
     #turnView;
     #boarView;
 
+    #dialogPlayers;
     #dialogFinished;
 
-    constructor(dialogFinished) {
+    constructor(dialogPlayers, dialogFinished) {
+        this.#dialogPlayers = dialogPlayers;
         this.#dialogFinished = dialogFinished;
     }
 
-    newGame(humanPlayers) {
+    newGame() {
+        this.#dialogPlayers.showModal();
+    }
+
+    reset(humanPlayers) {
         this.#game = new Game(humanPlayers);
         this.#boarView = new BoardView(this.#game.getBoard());
         this.#turnView = new TurnView(this.#game.getTurn(), this.#boarView);

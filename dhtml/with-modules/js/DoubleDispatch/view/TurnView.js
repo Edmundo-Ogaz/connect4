@@ -9,6 +9,7 @@ export class TurnView {
     constructor(turn, board) {
       this.#turn = turn;
       this.#boardView = board;
+      this.#updateTurn();
     }
 
     play() {
@@ -19,9 +20,9 @@ export class TurnView {
         randow.dropToken();
         const color = this.#turn.getCurrentPlayer().getColor();
         this.#boardView.writeToken(color);
-        this.#remove()
+        this.#removeTurn()
         this.#turn.next();
-        this.update();
+        this.#updateTurn();
         return 'automaticOperation';
     }
 
@@ -34,18 +35,18 @@ export class TurnView {
         const currentPlayer = this.#turn.getCurrentPlayer();
         currentPlayer.dropToken(column);
         this.#boardView.writeToken(currentPlayer.getColor());
-        this.#remove()
+        this.#removeTurn()
         this.#turn.next();
-        this.update();
+        this.#updateTurn();
     }
 
-    update() {
+    #updateTurn() {
         const currentPlayer = this.#turn.getCurrentPlayer();
         const player = document.getElementById(`player-${currentPlayer.getColor()}`);
         player.classList.add(`player__has-turn`); 
     }
 
-    #remove() {
+    #removeTurn() {
         const currentPlayer = this.#turn.getCurrentPlayer();
         const player = document.getElementById(`player-${currentPlayer.getColor()}`);
         player.classList.remove(`player__has-turn`); 

@@ -10,32 +10,20 @@ export class GameView {
     #turnView;
     #boarView;
 
-    #dialogPlayers = document.getElementsByClassName('dialog__players')[0];
-    #dialogFinished = document.getElementsByClassName('dialog__finished')[0];
+    #dialogFinished;
 
-    constructor() {
-        this.#dialogPlayers.addEventListener('close', () => {
-            const humanPlayers  = this.#dialogPlayers.returnValue;
-            this.#game = new Game(humanPlayers);
-            this.#boarView = new BoardView(this.#game.getBoard());
-            this.#turnView = new TurnView(this.#game.getTurn(), this.#boarView);
-            this.#play();
-        });
-        this.#dialogFinished.addEventListener('close', () => {
-            const response = this.#dialogFinished.returnValue;
-            if (response === 'yes') {
-                this.newGame();
-            }
-        });
+    constructor(dialogFinished) {
+        this.#dialogFinished = dialogFinished;
     }
-  
-    newGame() {
-      this.#dialogPlayers.showModal();
+
+    newGame(humanPlayers) {
+        this.#game = new Game(humanPlayers);
+        this.#boarView = new BoardView(this.#game.getBoard());
+        this.#turnView = new TurnView(this.#game.getTurn(), this.#boarView);
+        this.#play();
     }
 
     #play() {
-        this.#boarView.clean();
-        this.#turnView.update();
         let gameFinished;
         let turnResponse;
         do {

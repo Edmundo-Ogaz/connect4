@@ -4,9 +4,10 @@ export class BoardView {
   
     constructor(board) {
       this.#board = board;
+      this.#reset();
     }
 
-    clean() {
+    #reset() {
         for(let column = 0; column < 7; column++) {
             for(let row = 0; row < 6; row++) {
                 const cell = document.getElementById(`cell-${column}${row}`);

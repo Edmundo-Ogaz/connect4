@@ -1,22 +1,15 @@
-import { Coordinate } from './Coordinate.js'
-import { Direction } from './Direction.js'
+import { Direction } from './Direction.js';
+import { Coordinate } from './Coordinate.js';
 
-export class Board {
+class Board {
 
   static LINE_LENGTH = 4;
   #EMPTY_CELL = undefined;
   #cells;
   #currentCoordinate;
 
-  constructor() {}
-
-  reset() {
+  constructor() {
     this.#cells = Array.from(Array(Coordinate.MAX_ROWS), () => Array(Coordinate.MAX_COLUMNS));
-    this.#currentCoordinate = null;
-  }
-
-  getCurrentCoordinate() {
-    return this.#currentCoordinate;
   }
 
   getColor(coordinate) {
@@ -44,9 +37,6 @@ export class Board {
   }
 
   isWinner() {
-    if (this.#currentCoordinate === undefined) {
-      return false;
-    }
     for (let direction of Direction.values()) {
       let line = this.#getLine(this.#currentCoordinate, direction);
       for (let i = 0; i < Board.LINE_LENGTH; i++) {
@@ -58,10 +48,6 @@ export class Board {
     }
     return false;
   }
-
-  isFinished() {
-    return this.isComplete() || this.isWinner();
-}
 
   #calculateRow(column) {
     for (let row = 0; row < this.#cells.length; row++) {
@@ -89,3 +75,5 @@ export class Board {
     return true;
   }
 }
+
+export { Board };

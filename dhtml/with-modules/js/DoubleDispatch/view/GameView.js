@@ -6,60 +6,90 @@ import { TurnView } from "./TurnView.js";
 
 export class GameView {
 
-    #game;
-    #turnView;
-    #boarView;
+  #game;
+  #turnView;
+  #boarView;
 
-    #dialogPlayers;
-    #dialogFinished;
+  #dialogPlayers = document.getElementsByClassName('dialog__players')[0];
+  #dialogFinished = document.getElementsByClassName('dialog__finished')[0];
 
-    constructor(dialogPlayers, dialogFinished) {
-        this.#dialogPlayers = dialogPlayers;
-        this.#dialogFinished = dialogFinished;
-    }
+  constructor() {
+    this.#game = new Game();
+    this.#turnView = new TurnView(this.#game.getTurn());
+    this.#boarView = new BoardView(this.#game.getBoard(), this.dropToken.bind(this));
+    this.#addEventDialogPlayers();
+    this.#addEventDialogFinished();
+  }
 
-    newGame() {
-        this.#dialogPlayers.showModal();
-    }
+  newGame() {
+    this.#dialogPlayers.showModal();
+  }
 
-    reset(humanPlayers) {
-        this.#game = new Game(humanPlayers);
-        this.#boarView = new BoardView(this.#game.getBoard());
-        this.#turnView = new TurnView(this.#game.getTurn(), this.#boarView);
-        this.#play();
-    }
+  reset(humanPlayers) {
+    console.log(`GameView reset ${humanPlayers}`);
+    this.#game.reset(humanPlayers);
+    this.#boarView.reset();
+    this.#turnView.reset();
+    this.#play();
+  }
 
-    #play() {
-        let gameFinished;
-        let turnResponse;
-        do {
-            turnResponse = this.#turnView.play();
-            gameFinished = this.#game.isFinished();
-            if (gameFinished) {
-                this.#writeResult();
-            }
-        } while(!gameFinished && turnResponse !== 'manualOperation');
-    }
+  #play() {
+    console.log(`GameView play`);
+    let gameFinished;
+    let turnResponse;
+    do {
+      turnResponse = this.#turnView.play();
+      if (turnResponse === 'manualOperation') {
+        return;
+      }
+      this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor());
+      gameFinished = this.#game.isFinished();
+      if (!gameFinished) {
+        this.#turnView.next();
+      } else {
+        this.#writeResult();
+      }
+    } while (!gameFinished);
+  }
 
-    dropToken(column) {
-        assert(Coordinate.isColumnValid(column));
-        this.#turnView.dropToken(column)
-        const gameFinished = this.#game.isFinished();
-        if (!gameFinished) {
-            this.#turnView.play();
-        } else {
-            this.#writeResult();
-        }
-    }
-  
-    #writeResult() {
-        let msg;
-        if (this.#game.getBoard().isWinner()) {
-            msg = `The winner is the player ${this.#game.getTurn().getCurrentPlayer().getColor().toUpperCase()}`;
-        } else {
-            msg = `Tied Game`;
-        }
-        document.getElementsByClassName('dialog__finished-title')[0].innerHTML = msg;
-        this.#dialogFinished.showModal();
+  dropToken(column) {
+    console.log(`GameView dropToken ${column}`);
+    assert(Coordinate.isColumnValid(column));
+    this.#turnView.dropToken(column);
+    this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor());
+    const gameFinished = this.#game.isFinished();
+    if (!gameFinished) {
+      this.#turnView.next();
+      this.#play();
+    } else {
+      this.#writeResult();
     }
   }
+
+  #writeResult() {
+    let msg;
+    if (this.#game.getBoard().isWinner()) {
+      msg = `The winner is the player ${this.#game.getCurrentPlayer().getColor().toUpperCase()}`;
+    } else {
+      msg = `Tied Game`;
+    }
+    document.getElementsByClassName('dialog__finished-title')[0].innerHTML = msg;
+    this.#dialogFinished.showModal();
+  }
+
+  #addEventDialogPlayers() {
+    this.#dialogPlayers.addEventListener('close', () => {
+      const humanPlayers = this.#dialogPlayers.returnValue;
+      this.reset(humanPlayers);
+    });
+  }
+
+  #addEventDialogFinished() {
+    this.#dialogFinished.addEventListener('close', () => {
+      const response = this.#dialogFinished.returnValue;
+      if (response === 'yes') {
+        this.newGame();
+      }
+    });
+  }
+}

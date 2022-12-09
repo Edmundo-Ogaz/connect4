@@ -1,19 +1,14 @@
 import { Board } from './Board.js'
 import { Turn } from './Turn.js'
 
-export class Game {
-
+class Game {
   #board;
+
   #turn;
 
   constructor() {
     this.#board = new Board();
     this.#turn = new Turn(this.#board);
-  }
-
-  reset(humanPlayers) {
-    this.#board.reset();
-    this.#turn.reset(humanPlayers);
   }
 
   getBoard() {
@@ -28,10 +23,9 @@ export class Game {
     return this.#turn.getCurrentPlayer();
   }
 
-  getCurrentCoordinate() {
-    return this.#board.getCurrentCoordinate();
+  changeTurn() {
+    this.#turn.changeTurn();
   }
-
   isWinner() {
     return this.#board.isWinner();
   }
@@ -40,3 +34,5 @@ export class Game {
     return this.#board.isWinner() || this.#board.isComplete();
   }
 }
+
+export { Game };

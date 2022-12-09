@@ -1,7 +1,7 @@
-import { ClosedInterval } from './ClosedInterval.js'
-import { Human, Random } from './Player.js'
+import { Human, Random } from './Player.js';
+import { ClosedInterval } from './ClosedInterval.js';
 
-export class Turn {
+class Turn {
 
   static MAX_PLAYERS = 2;
   static NUMBER_PLAYER = new ClosedInterval(0, Turn.MAX_PLAYERS);
@@ -13,8 +13,7 @@ export class Turn {
     this.#board = board;
   }
 
-  reset(humanPlayers) {
-    this.#players = [];
+  createPlayers(humanPlayers) {
     for (let i = 0; i < Turn.MAX_PLAYERS; i++) {
       const player = (i < humanPlayers) ? new Human(i, this.#board) : new Random(i, this.#board);
       this.#players.push(player);
@@ -25,13 +24,13 @@ export class Turn {
     return this.#players[this.#currentTurn];
   }
 
-  next() {
-    if (!this.#board.isFinished()) {
-      this.#currentTurn = (this.#currentTurn + 1) % Turn.MAX_PLAYERS;
-    }
+  changeTurn() {
+    this.#currentTurn = (this.#currentTurn + 1) % Turn.MAX_PLAYERS;
   }
 
   static isNumberPlayerValid(number) {
     return Turn.NUMBER_PLAYER.isIncluded(number);
   }
 }
+
+export { Turn };

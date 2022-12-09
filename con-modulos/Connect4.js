@@ -14,4 +14,4 @@ class Connect4 {
   }
 }
 
-module.exports.Connect4 = Connect4;
+exports.Connect4 = Connect4;

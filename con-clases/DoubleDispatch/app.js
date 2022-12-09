@@ -1,5 +1,5 @@
 
-const { Console } = require("console-mpds");
+import { Console } from 'console-mpds';
 const console = new Console();
 
 class ClosedInterval {
@@ -68,7 +68,7 @@ class Direction {
     return this.#coordinate;
   }
 
-  getOppocite() {
+  getOpposite() {
     return new Direction(this.#coordinate.row * -1, this.#coordinate.column * -1);
   }
 
@@ -77,53 +77,15 @@ class Direction {
   }
 }
 
-class Line {
-
-  static LENGTH = 4;
-  #coordinates;
-
-  constructor(initialCoordinate, direction) {
-    this.#coordinates = [initialCoordinate];
-    for (let i = 0; i < Line.LENGTH - 1; i++) {
-      this.#coordinates.push(this.#coordinates[i].getShifted(direction.getCoordinate()));
-    }
-  }
-
-  getCoordinate(ordinal) {
-    return this.#coordinates[ordinal];
-  }
-
-  shiftOne(direction) {
-    this.#coordinates = this.#coordinates.map(coordinate => coordinate.getShifted(direction.getCoordinate()));
-  }
-}
-
 class Board {
 
+  static LINE_LENGTH = 4;
   #EMPTY_CELL = undefined;
   #cells;
   #currentCoordinate;
 
   constructor() {
     this.#cells = Array.from(Array(Coordinate.MAX_ROWS), () => Array(Coordinate.MAX_COLUMNS));
-  }
-
-  #calculateRow(column) {
-    for (let row = 0; row < this.#cells.length; row++) {
-      if (this.#cells[row][column] === this.#EMPTY_CELL) {
-        return row;
-      }
-    }
-  }
-
-  #isConnect4(line) {
-    const COLOR = this.getColor(line.getCoordinate(0));
-    for (let i = 1; i < Line.LENGTH; i++) {
-      if (this.getColor(line.getCoordinate(i)) !== COLOR) {
-        return false;
-      }
-    }
-    return true;
   }
 
   getColor(coordinate) {
@@ -151,17 +113,42 @@ class Board {
   }
 
   isWinner() {
-    const DIRECTIONS = Direction.values();
-    let isWinner = false;
-    for (let i = 0; !isWinner && i < DIRECTIONS.length; i++) {
-      let line = new Line(this.#currentCoordinate, DIRECTIONS[i]);
-      isWinner = this.#isConnect4(line);
-      for (let j = 0; !isWinner && j < Line.LENGTH - 1; j++) {
-        line.shiftOne(DIRECTIONS[i].getOppocite());
-        isWinner = this.#isConnect4(line);
+    for (let direction of Direction.values()) {
+      let line = this.#getLine(this.#currentCoordinate, direction);
+      for (let i = 0; i < Board.LINE_LENGTH; i++) {
+        if (this.#isConnect4(line)) {
+          return true;
+        };
+        line = line.map(coordinate => coordinate.getShifted(direction.getOpposite().getCoordinate()));
       }
     }
-    return isWinner;
+    return false;
+  }
+
+  #calculateRow(column) {
+    for (let row = 0; row < this.#cells.length; row++) {
+      if (this.#cells[row][column] === this.#EMPTY_CELL) {
+        return row;
+      }
+    }
+  }
+
+  #getLine(initialCoordinate, direction) {
+    let coordinates = [initialCoordinate];
+    for (let i = 0; i < Board.LINE_LENGTH - 1; i++) {
+      coordinates.push(coordinates[i].getShifted(direction.getCoordinate()));
+    }
+    return coordinates;
+  }
+
+  #isConnect4(line) {
+    const COLOR = this.getColor(line[0]);
+    for (let i = 1; i < Board.LINE_LENGTH; i++) {
+      if (this.getColor(line[i]) !== COLOR) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -214,8 +201,8 @@ class Player {
 
 class Human extends Player {
 
-  constructor(i, board) {
-    super(Color.get(i), board);
+  constructor(playerNumber, board) {
+    super(Color.get(playerNumber), board);
   }
 
   dropToken(column) {
@@ -226,15 +213,15 @@ class Human extends Player {
     super.dropToken(column);
   }
 
-  accept(playerView) {
-    playerView.visitHuman(this)
+  accept(turnView) {
+    turnView.visitHuman(this)
   }
 }
 
 class Random extends Player {
 
-  constructor(i, board) {
-    super(Color.get(i), board);
+  constructor(playerNumber, board) {
+    super(Color.get(playerNumber), board);
   }
 
   dropToken() {
@@ -245,8 +232,8 @@ class Random extends Player {
     super.dropToken(column);
   }
 
-  accept(playerView) {
-    playerView.visitRandom(this)
+  accept(turnView) {
+    turnView.visitRandom(this)
   }
 }
 
@@ -282,41 +269,6 @@ class Turn {
   }
 }
 
-class Game {
-
-  #board;
-  #turn;
-
-  constructor() {
-    this.#board = new Board();
-    this.#turn = new Turn(this.#board);
-  }
-
-  getBoard() {
-    return this.#board;
-  }
-
-  getTurn() {
-    return this.#turn;
-  }
-
-  getCurrentPlayer() {
-    return this.#turn.getCurrentPlayer();
-  }
-
-  changeTurn() {
-    this.#turn.changeTurn();
-  }
-
-  isWinner() {
-    return this.#board.isWinner();
-  }
-
-  isFinished() {
-    return this.#board.isWinner() || this.#board.isComplete();
-  }
-}
-
 class BoardView {
 
   #board;
@@ -337,10 +289,29 @@ class BoardView {
   }
 }
 
-class PlayerView {
+class TurnView {
 
-  receive(player) {
-    player.accept(this);
+  #turn;
+
+  constructor(turn) {
+    this.#turn = turn;
+  }
+
+  configure() {
+    let humanPlayers;
+    let error = false;
+    do {
+      humanPlayers = console.readNumber(`Tell me the number of human players (until 2)`);
+      error = !Turn.isNumberPlayerValid(humanPlayers)
+      if (error) {
+        console.writeln(`This number of human players is not valid!`);
+      }
+    } while (error);
+    this.#turn.createPlayers(humanPlayers);
+  }
+
+  play() {
+    this.#turn.getCurrentPlayer().accept(this);
   }
 
   visitRandom(randow) {
@@ -365,43 +336,18 @@ class PlayerView {
   }
 }
 
-class TurnView {
-
-  #turn;
-  #playerView = new PlayerView()
-
-  constructor(turn) {
-    this.#turn = turn;
-  }
-
-  configure() {
-    let humanPlayers;
-    let error = false;
-    do {
-      humanPlayers = console.readNumber(`Tell me the number of human players (until 2)`);
-      error = !Turn.isNumberPlayerValid(humanPlayers)
-      if (error) {
-        console.writeln(`This number of human players is not valid!`);
-      }
-    } while (error);
-    this.#turn.createPlayers(humanPlayers);
-  }
-
-  play() {
-    this.#playerView.receive(this.#turn.getCurrentPlayer());
-  }
-}
-
 class GameView {
 
-  #game;
+  #board;
+  #turn;
   #boardView;
   #turnView;
 
-  constructor(game) {
-    this.#game = game;
-    this.#boardView = new BoardView(this.#game.getBoard());
-    this.#turnView = new TurnView(this.#game.getTurn());
+  constructor() {
+    this.#board = new Board();
+    this.#turn = new Turn(this.#board);
+    this.#boardView = new BoardView(this.#board);
+    this.#turnView = new TurnView(this.#turn);
   }
 
   play() {
@@ -411,9 +357,9 @@ class GameView {
     do {
       this.#boardView.writeln();
       this.#turnView.play();
-      gameFinished = this.#game.isFinished();
+      gameFinished = this.#board.isWinner() || this.#board.isComplete();
       if (!gameFinished) {
-        this.#game.changeTurn();
+        this.#turn.changeTurn();
       }
     } while (!gameFinished);
     this.#writeResult();
@@ -421,7 +367,7 @@ class GameView {
 
   #writeResult() {
     this.#boardView.writeln();
-    console.writeln(this.#game.isWinner() ? `The winner is the player ${this.#game.getCurrentPlayer().getColor()}` : `Tied Game`);
+    console.writeln(this.#board.isWinner() ? `The winner is the player ${this.#turn.getCurrentPlayer().getColor()}` : `Tied Game`);
   }
 }
 
@@ -459,7 +405,7 @@ class Connect4 {
   play() {
     const continueDialogView = new YesNoDialogView(`Do you want to continue? (yes/no)`);
     do {
-      new GameView(new Game()).play();
+      new GameView().play();
       continueDialogView.read();
     } while (continueDialogView.isAffirmative());
   }
@@ -467,5 +413,4 @@ class Connect4 {
 
 new Connect4().play();
 
-module.exports.Game = Game;
-module.exports.Coordinate = Coordinate;
+export { Board, Turn, Coordinate };

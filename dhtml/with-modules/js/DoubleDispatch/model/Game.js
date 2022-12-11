@@ -5,15 +5,17 @@ export class Game {
 
   #board;
   #turn;
+  #humanPlayers;
 
   constructor() {
     this.#board = new Board();
     this.#turn = new Turn(this.#board);
   }
 
-  reset(humanPlayers) {
-    this.#board.reset();
+  reset(humanPlayers, colors) {
+    this.#board.reset(colors);
     this.#turn.reset(humanPlayers);
+    this.#humanPlayers = humanPlayers;
   }
 
   getBoard() {
@@ -22,6 +24,10 @@ export class Game {
 
   getTurn() {
     return this.#turn;
+  }
+
+  getHumanPlayers() {
+    return this.#humanPlayers;
   }
 
   getCurrentPlayer() {

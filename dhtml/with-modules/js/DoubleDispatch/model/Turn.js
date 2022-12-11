@@ -25,6 +25,10 @@ export class Turn {
     return this.#players[this.#currentTurn];
   }
 
+  getCurrentTurn() {
+    return this.#currentTurn;
+  }
+
   next() {
     if (!this.#board.isFinished()) {
       this.#currentTurn = (this.#currentTurn + 1) % Turn.MAX_PLAYERS;

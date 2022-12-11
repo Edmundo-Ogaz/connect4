@@ -34,5 +34,14 @@ export class BoardView {
     cell.classList.add(`has-${color}`);
     const checker = document.getElementById(`checker-${currentCoordinate.column}${currentCoordinate.row}`);
     checker.checked = true;
+    this.#changeBoardTurn(color);
+  }
+
+  #changeBoardTurn(color) {
+    const header = document.querySelectorAll(`.board__header`);
+    header.forEach((element, idx) => {
+      element.className = 'board__header board__cell';
+      element.classList.add(`turn-${color}`)
+    })
   }
 }

@@ -10,8 +10,10 @@ export class GameView {
   #turnView;
   #boarView;
 
-  #dialogPlayers = document.getElementsByClassName('dialog__players')[0];
-  #dialogFinished = document.getElementsByClassName('dialog__finished')[0];
+  #dialogPlayers = document.querySelectorAll('.dialog__players')[0];
+  #dialogFinished = document.querySelector('#dialog-yes-no');
+  #saveGame = document.querySelector('#save-game');
+  #recoverGame = document.querySelector('#recover-game');
 
   constructor() {
     this.#game = new Game();
@@ -19,6 +21,8 @@ export class GameView {
     this.#boarView = new BoardView(this.#game.getBoard(), this.dropToken.bind(this));
     this.#addEventDialogPlayers();
     this.#addEventDialogFinished();
+    this.#addEventSaveGame();
+    this.#addEventRecoverGame();
   }
 
   newGame() {
@@ -26,7 +30,6 @@ export class GameView {
   }
 
   reset(humanPlayers) {
-    console.log(`GameView reset ${humanPlayers}`);
     this.#game.reset(humanPlayers);
     this.#boarView.reset();
     this.#turnView.reset();
@@ -73,7 +76,7 @@ export class GameView {
     } else {
       msg = `Tied Game`;
     }
-    document.getElementsByClassName('dialog__finished-title')[0].innerHTML = msg;
+    document.querySelector('#dialog-yes-no__title').innerHTML = msg;
     this.#dialogFinished.showModal();
   }
 
@@ -90,6 +93,27 @@ export class GameView {
       if (response === 'yes') {
         this.newGame();
       }
+    });
+  }
+
+  #addEventSaveGame() {
+    this.#saveGame.addEventListener('click', () => {
+      let humanPlayers = this.#game.getHumanPlayers();
+
+      const game = {
+        humanPlayers,
+        turn: this.#game.getTurn().getCurrentTurn(),
+        colors: this.#game.getBoard().getColors()
+      }
+      localStorage.setItem('game', JSON.stringify(game));
+      alert("Game saved");
+    });
+  }
+
+  #addEventRecoverGame() {
+    this.#recoverGame.addEventListener('click', () => {
+      const game = JSON.parse(localStorage.getItem('game'));
+      this.reset(game.humanPlayers, game.colors);
     });
   }
 }

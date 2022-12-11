@@ -1,3 +1,4 @@
+import { assert } from '../utils/assert.js';
 import { Coordinate } from './Coordinate.js'
 import { Direction } from './Direction.js'
 
@@ -5,13 +6,18 @@ export class Board {
 
   static LINE_LENGTH = 4;
   #EMPTY_CELL = undefined;
-  #cells;
+  #colors;
   #currentCoordinate;
 
   constructor() {}
 
-  reset() {
-    this.#cells = Array.from(Array(Coordinate.MAX_ROWS), () => Array(Coordinate.MAX_COLUMNS));
+  reset(colors) {
+    if (colors) {
+      assert(Array.isArray(colors));
+      this.#colors = colors;
+    } else {
+      this.#colors = Array.from(Array(Coordinate.MAX_ROWS), () => Array(Coordinate.MAX_COLUMNS));
+    }
     this.#currentCoordinate = null;
   }
 
@@ -21,19 +27,23 @@ export class Board {
 
   getColor(coordinate) {
     if (Coordinate.isRowValid(coordinate.row)) {
-      return this.#cells[coordinate.row][coordinate.column];
+      return this.#colors[coordinate.row][coordinate.column];
     }
+  }
+
+  getColors() {
+    return this.#colors;
   }
 
   dropToken(column, color) {
     const row = this.#calculateRow(column);
-    this.#cells[row][column] = color;
+    this.#colors[row][column] = color;
     this.#currentCoordinate = new Coordinate(row, column);
   }
 
   isComplete(column) {
     if (column !== undefined) {
-      return this.#cells[Coordinate.MAX_ROWS - 1][column] !== this.#EMPTY_CELL;
+      return this.#colors[Coordinate.MAX_ROWS - 1][column] !== this.#EMPTY_CELL;
     }
     for (let i = 0; i < Coordinate.MAX_COLUMNS; i++) {
       if (!this.isComplete(i)) {
@@ -64,8 +74,8 @@ export class Board {
 }
 
   #calculateRow(column) {
-    for (let row = 0; row < this.#cells.length; row++) {
-      if (this.#cells[row][column] === this.#EMPTY_CELL) {
+    for (let row = 0; row < this.#colors.length; row++) {
+      if (this.#colors[row][column] === this.#EMPTY_CELL) {
         return row;
       }
     }

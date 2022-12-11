@@ -38,7 +38,23 @@
                     </button>
                 </li>
                 <li class="nav__item">
-                    <button id="exit-game" class="button" onclick="window.close();">
+                    <button id="save-game" class="button">
+                        <svg class="button__icon button__icon--mr" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#57C3FF"/>
+                        </svg>
+                        <span class="button__txt">Save Game</span>
+                    </button>
+                </li>
+                <li class="nav__item">
+                    <button id="recover-game" class="button">
+                        <svg class="button__icon button__icon--mr" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#57C3FF"/>
+                        </svg>
+                        <span class="button__txt">Recover Game</span>
+                    </button>
+                </li>
+                <li class="nav__item">
+                    <button id="exit-game" class="button">
                         <svg class="button__icon button__icon--mr" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#57C3FF"/>
                         </svg>
@@ -279,9 +295,9 @@
                 <button type="submit" value="0">Machine<br>VS<br>Machine</button>
             </form>
         </dialog>
-        <dialog class="dialog__finished">
+        <dialog id="dialog-yes-no">
             <form method="dialog">
-                <h1 class="dialog__finished-title"></h1>
+                <h1 id="dialog-yes-no__title"></h1>
                 <p>Do you want to continue?</p>
                 <button type="submit" value="yes">Yes</button>
                 <button type="submit" value="no">No</button>

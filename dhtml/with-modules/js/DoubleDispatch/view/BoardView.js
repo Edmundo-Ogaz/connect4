@@ -1,4 +1,5 @@
 import { Coordinate } from '../model/Coordinate.js'
+import { assert } from '../utils/assert.js';
 export class BoardView {
 
   #board;
@@ -6,22 +7,33 @@ export class BoardView {
   constructor(board, callback) {
     this.#board = board;
     this.#addEventClick(callback);
-    this.reset();
   }
 
-  reset() {
-    for (let column = 0; column < Coordinate.MAX_COLUMNS; column++) {
-      for (let row = 0; row < Coordinate.MAX_ROWS; row++) {
-        const cell = document.getElementById(`cell-${column}${row}`);
-        cell.className = 'board__cell';
-        const checker = document.getElementById(`checker-${column}${row}`);
-        checker.checked = false;
+  reset(colors, currentColor) {
+    assert(Array.isArray(colors));
+    assert(currentColor)
+    for (let row = 0; row < Coordinate.MAX_ROWS; row++) {
+      for (let column = 0; column < Coordinate.MAX_COLUMNS; column++) {
+        let checked = false;
+        let className = 'board__cell';
+        if (row === Coordinate.MAX_ROWS - 1) {
+          className += ' board__header';
+        }
+
+        if (colors[row][column]) {
+          className += ` has-${colors[row][column]}`;
+          checked = true;
+        }
+
+        document.querySelector(`#cell-${row}${column}`).className = className;
+        document.querySelector(`#checker-${row}${column}`).checked = checked;
       }
     }
+    this.changeBoardTurn(currentColor);
   }
 
   #addEventClick(callback) {
-    document.querySelectorAll('.board__column').forEach((element, key) => {
+    document.querySelectorAll('.board__header').forEach((element, key) => {
       element.addEventListener('click', () => {
         callback(key)
       })
@@ -30,14 +42,11 @@ export class BoardView {
 
   writeToken(color) {
     const currentCoordinate = this.#board.getCurrentCoordinate();
-    const cell = document.getElementById(`cell-${currentCoordinate.column}${currentCoordinate.row}`);
-    cell.classList.add(`has-${color}`);
-    const checker = document.getElementById(`checker-${currentCoordinate.column}${currentCoordinate.row}`);
-    checker.checked = true;
-    this.#changeBoardTurn(color);
+    document.getElementById(`cell-${currentCoordinate.row}${currentCoordinate.column}`).classList.add(`has-${color}`);
+    document.getElementById(`checker-${currentCoordinate.row}${currentCoordinate.column}`).checked = true;
   }
 
-  #changeBoardTurn(color) {
+  changeBoardTurn(color) {
     const header = document.querySelectorAll(`.board__header`);
     header.forEach((element, idx) => {
       element.className = 'board__header board__cell';

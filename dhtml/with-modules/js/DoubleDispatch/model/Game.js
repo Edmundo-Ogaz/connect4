@@ -12,9 +12,9 @@ export class Game {
     this.#turn = new Turn(this.#board);
   }
 
-  reset(humanPlayers, colors) {
+  reset(humanPlayers, colors, currentTurn) {
     this.#board.reset(colors);
-    this.#turn.reset(humanPlayers);
+    this.#turn.reset(humanPlayers, currentTurn);
     this.#humanPlayers = humanPlayers;
   }
 

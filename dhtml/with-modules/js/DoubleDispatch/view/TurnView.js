@@ -20,19 +20,19 @@ export class TurnView {
     }
 
     visitRandom(randow) {
-        console.log(`TurnView visitRandom`);
         randow.dropToken();
     }
 
     visitHuman(human) {
-        console.log(`TurnView visitHuman`);
         return 'manualOperation';
       }
 
     dropToken(column) {
+        console.log(`dropToken`);
         assert(Coordinate.isColumnValid(column));
         const currentPlayer = this.#turn.getCurrentPlayer();
-        currentPlayer.dropToken(column);
+        const error = currentPlayer.dropToken(column);
+        console.log(`dropToken error ${error}`);
     }
 
     next() {

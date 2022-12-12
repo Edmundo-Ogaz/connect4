@@ -1,6 +1,7 @@
 import { assert } from "../utils/assert.js";
 import { Coordinate } from "../model/Coordinate.js";
 import { Game } from "../model/Game.js";
+import { Turn } from "../model/Turn.js";
 import { BoardView } from "./BoardView.js";
 import { TurnView } from "./TurnView.js";
 
@@ -29,15 +30,19 @@ export class GameView {
     this.#dialogPlayers.showModal();
   }
 
-  reset(humanPlayers) {
-    this.#game.reset(humanPlayers);
-    this.#boarView.reset();
+  reset(humanPlayers, colors, currentTurn = 0) {
+    assert(Turn.isNumberPlayerValid(humanPlayers));
+    assert(Coordinate.NUMBER_ROWS.isIncluded(colors.length - 1));
+    assert(Coordinate.NUMBER_COLUMNS.isIncluded(colors[0].length - 1));
+    assert(Turn.isNumberTurnValid(currentTurn));
+    this.#game.reset(humanPlayers, colors, currentTurn);
+    const currentColor = this.#game.getCurrentPlayer().getColor();
+    this.#boarView.reset(colors, currentColor);
     this.#turnView.reset();
     this.#play();
   }
 
   #play() {
-    console.log(`GameView play`);
     let gameFinished;
     let turnResponse;
     do {
@@ -56,13 +61,14 @@ export class GameView {
   }
 
   dropToken(column) {
-    console.log(`GameView dropToken ${column}`);
+    console.log(`dropToken`);
     assert(Coordinate.isColumnValid(column));
     this.#turnView.dropToken(column);
     this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor());
     const gameFinished = this.#game.isFinished();
     if (!gameFinished) {
       this.#turnView.next();
+      this.#boarView.changeBoardTurn(this.#game.getCurrentPlayer().getColor());
       this.#play();
     } else {
       this.#writeResult();
@@ -83,7 +89,9 @@ export class GameView {
   #addEventDialogPlayers() {
     this.#dialogPlayers.addEventListener('close', () => {
       const humanPlayers = this.#dialogPlayers.returnValue;
-      this.reset(humanPlayers);
+      const colors = Array.from(Array(Coordinate.MAX_ROWS), () => Array.from(Array(Coordinate.MAX_COLUMNS), () => null));
+
+      this.reset(humanPlayers, colors);
     });
   }
 
@@ -113,7 +121,7 @@ export class GameView {
   #addEventRecoverGame() {
     this.#recoverGame.addEventListener('click', () => {
       const game = JSON.parse(localStorage.getItem('game'));
-      this.reset(game.humanPlayers, game.colors);
+      this.reset(game.humanPlayers, game.colors, game.turn);
     });
   }
 }

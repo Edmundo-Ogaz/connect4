@@ -1,11 +1,12 @@
+import { assert } from '../utils/assert.js'
 import { Board } from './Board.js'
 import { Turn } from './Turn.js'
+import { Coordinate } from './Coordinate.js'
 
 export class Game {
 
   #board;
   #turn;
-  #humanPlayers;
 
   constructor() {
     this.#board = new Board();
@@ -13,9 +14,10 @@ export class Game {
   }
 
   reset(humanPlayers, colors, currentTurn) {
+    assert(Turn.isNumberPlayerValid(humanPlayers));
+    assert(Turn.isNumberTurnValid(currentTurn));
     this.#board.reset(colors);
     this.#turn.reset(humanPlayers, currentTurn);
-    this.#humanPlayers = humanPlayers;
   }
 
   getBoard() {
@@ -26,12 +28,12 @@ export class Game {
     return this.#turn;
   }
 
-  getHumanPlayers() {
-    return this.#humanPlayers;
-  }
-
   getCurrentPlayer() {
     return this.#turn.getCurrentPlayer();
+  }
+
+  getCurrentTurn() {
+    return this.#turn.getCurrentTurn();
   }
 
   getCurrentCoordinate() {

@@ -20,4 +20,7 @@ export class Color {
     return [Color.YELLOW, Color.RED];
   }
 
+  static isColorValid(color) {
+    return color.toString() === this.YELLOW.toString() || color.toString() === this.RED.toString();
+  }
 }

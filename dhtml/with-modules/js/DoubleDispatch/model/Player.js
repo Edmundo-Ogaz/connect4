@@ -12,7 +12,7 @@ export class Player {
   }
 
   getColor() {
-    return this.#color.toString();
+    return this.#color;
   }
 
   isComplete(column) {
@@ -21,12 +21,7 @@ export class Player {
   }
 
   dropToken(column) {
-    console.log(`dropToken`);
     assert(Coordinate.NUMBER_COLUMNS.isIncluded(column));
     this.#board.dropToken(column, this.#color.toString());
-  }
-
-  get board() {
-    return this.#board;
   }
 }

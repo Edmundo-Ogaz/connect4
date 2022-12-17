@@ -1,56 +1,70 @@
 import { Coordinate } from '../model/Coordinate.js'
+import { Color } from '../model/Color.js'
 import { assert } from '../utils/assert.js';
+import { Turn } from '../model/Turn.js';
 export class BoardView {
 
   #board;
+  #callback;
+  #existEventClick;
 
   constructor(board, callback) {
     this.#board = board;
-    this.#addEventClick(callback);
+    this.#callback = function() { callback(parseInt(this.role)) };
   }
 
-  reset(colors, currentColor) {
-    assert(Array.isArray(colors));
-    assert(currentColor)
+  reset(currentColor, existEventClick) {
+    assert(Color.isColorValid(currentColor));
+    assert(typeof existEventClick == "boolean");
     for (let row = 0; row < Coordinate.MAX_ROWS; row++) {
       for (let column = 0; column < Coordinate.MAX_COLUMNS; column++) {
-        let checked = false;
         let className = 'board__cell';
         if (row === Coordinate.MAX_ROWS - 1) {
           className += ' board__header';
         }
 
-        if (colors[row][column]) {
-          className += ` has-${colors[row][column]}`;
-          checked = true;
-        }
+        const color = this.#board.getColor(new Coordinate(row, column));
+        className += color ? ` has-${color}` : ``;
 
         document.querySelector(`#cell-${row}${column}`).className = className;
-        document.querySelector(`#checker-${row}${column}`).checked = checked;
+        document.querySelector(`#checker-${row}${column}`).checked = Boolean(color);
       }
     }
-    this.changeBoardTurn(currentColor);
+    this.#existEventClick = existEventClick;
+    existEventClick && this.#changeTurn(currentColor);
+    existEventClick ? this.#addEventClick(this.#callback) : this.#removeEventClick(this.#callback);
   }
 
   #addEventClick(callback) {
-    document.querySelectorAll('.board__header').forEach((element, key) => {
-      element.addEventListener('click', () => {
-        callback(key)
-      })
+    assert(typeof callback === 'function')
+    document.querySelectorAll('.board__header').forEach((element) => {
+      element.addEventListener('click', this.#callback)
     })
   }
 
-  writeToken(color) {
-    const currentCoordinate = this.#board.getCurrentCoordinate();
-    document.getElementById(`cell-${currentCoordinate.row}${currentCoordinate.column}`).classList.add(`has-${color}`);
-    document.getElementById(`checker-${currentCoordinate.row}${currentCoordinate.column}`).checked = true;
+  #removeEventClick(callback) {
+    assert(typeof callback === 'function')
+    document.querySelectorAll('.board__header').forEach((element, key) => {
+      element.removeEventListener('click', this.#callback)
+    })
   }
 
-  changeBoardTurn(color) {
+  writeToken(currentColor, currentTurn) {
+    assert(Color.isColorValid(currentColor));
+    const currentCoordinate = this.#board.getCurrentCoordinate();
+    document.getElementById(`cell-${currentCoordinate.row}${currentCoordinate.column}`).classList.add(`has-${currentColor}`);
+    document.getElementById(`checker-${currentCoordinate.row}${currentCoordinate.column}`).checked = true;
+    const ordinal = (currentTurn + 1) % Turn.MAX_PLAYERS;
+    this.#existEventClick && this.#changeTurn(Color.get(ordinal));
+    
+  }
+
+  #changeTurn(currentColor) {
+    assert(Color.isColorValid(currentColor));
     const header = document.querySelectorAll(`.board__header`);
     header.forEach((element, idx) => {
       element.className = 'board__header board__cell';
-      element.classList.add(`turn-${color}`)
+      element.classList.add(`turn-${currentColor}`)
     })
   }
 }

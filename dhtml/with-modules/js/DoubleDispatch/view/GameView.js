@@ -11,64 +11,57 @@ export class GameView {
   #turnView;
   #boarView;
 
-  #dialogPlayers = document.querySelectorAll('.dialog__players')[0];
+  #dialogPlayers = document.querySelector('#dialog__players');
   #dialogFinished = document.querySelector('#dialog-yes-no');
+  #newGame = document.querySelector('#new-game');
   #saveGame = document.querySelector('#save-game');
   #recoverGame = document.querySelector('#recover-game');
 
   constructor() {
     this.#game = new Game();
     this.#turnView = new TurnView(this.#game.getTurn());
-    this.#boarView = new BoardView(this.#game.getBoard(), this.dropToken.bind(this));
+    this.#boarView = new BoardView(this.#game.getBoard(), this.#dropToken.bind(this));
+    this.#addEnventButtonNewGame();
     this.#addEventDialogPlayers();
     this.#addEventDialogFinished();
-    this.#addEventSaveGame();
-    this.#addEventRecoverGame();
+    this.#addEventButtonSaveGame();
+    this.#addEventButtonRecoverGame();
   }
 
-  newGame() {
+  init() {
     this.#dialogPlayers.showModal();
   }
 
-  reset(humanPlayers, colors, currentTurn = 0) {
+  reset(humanPlayers, colors = null, currentTurn = 0) {
     assert(Turn.isNumberPlayerValid(humanPlayers));
-    assert(Coordinate.NUMBER_ROWS.isIncluded(colors.length - 1));
-    assert(Coordinate.NUMBER_COLUMNS.isIncluded(colors[0].length - 1));
     assert(Turn.isNumberTurnValid(currentTurn));
     this.#game.reset(humanPlayers, colors, currentTurn);
     const currentColor = this.#game.getCurrentPlayer().getColor();
-    this.#boarView.reset(colors, currentColor);
+    this.#boarView.reset(currentColor, humanPlayers > 0 ? true : false);
     this.#turnView.reset();
     this.#play();
   }
 
   #play() {
-    let gameFinished;
-    let turnResponse;
-    do {
-      turnResponse = this.#turnView.play();
-      if (turnResponse === 'manualOperation') {
-        return;
-      }
-      this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor());
-      gameFinished = this.#game.isFinished();
-      if (!gameFinished) {
-        this.#turnView.next();
-      } else {
-        this.#writeResult();
-      }
-    } while (!gameFinished);
+    this.#game.getCurrentPlayer().accept(this)
   }
 
-  dropToken(column) {
-    console.log(`dropToken`);
-    assert(Coordinate.isColumnValid(column));
-    this.#turnView.dropToken(column);
-    this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor());
+  visitHuman() {
+  }
+
+  visitRandom() {
+    setTimeout(() => {
+      this.#dropToken()
+    }, 300)
+  }
+
+  #dropToken(column) {
+    assert(!this.#game.isFinished());
+    this.#turnView.play(column);
+    this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor(), this.#game.getCurrentTurn());
     const gameFinished = this.#game.isFinished();
     if (!gameFinished) {
-      this.#turnView.next();
-      this.#boarView.changeBoardTurn(this.#game.getCurrentPlayer().getColor());
+      this.#turnView.changeTurn();
       this.#play();
     } else {
       this.#writeResult();
@@ -78,7 +71,7 @@ export class GameView {
   #writeResult() {
     let msg;
     if (this.#game.getBoard().isWinner()) {
-      msg = `The winner is the player ${this.#game.getCurrentPlayer().getColor().toUpperCase()}`;
+      msg = `The winner is the player ${this.#game.getCurrentPlayer().getColor().toString().toUpperCase()}`;
     } else {
       msg = `Tied Game`;
     }
@@ -86,12 +79,15 @@ export class GameView {
     this.#dialogFinished.showModal();
   }
 
+  #addEnventButtonNewGame() {
+    this.#newGame.addEventListener('click', this.init.bind(this));
+  }
+
   #addEventDialogPlayers() {
     this.#dialogPlayers.addEventListener('close', () => {
       const humanPlayers = this.#dialogPlayers.returnValue;
-      const colors = Array.from(Array(Coordinate.MAX_ROWS), () => Array.from(Array(Coordinate.MAX_COLUMNS), () => null));
-
-      this.reset(humanPlayers, colors);
+      this.reset(humanPlayers);
+      sessionStorage.setItem('humanPlayers', humanPlayers);
     });
   }
 
@@ -99,18 +95,17 @@ export class GameView {
     this.#dialogFinished.addEventListener('close', () => {
       const response = this.#dialogFinished.returnValue;
       if (response === 'yes') {
-        this.newGame();
+        this.init();
       }
     });
   }
 
-  #addEventSaveGame() {
+  #addEventButtonSaveGame() {
     this.#saveGame.addEventListener('click', () => {
-      let humanPlayers = this.#game.getHumanPlayers();
-
+      let humanPlayers = sessionStorage.getItem('humanPlayers');
       const game = {
         humanPlayers,
-        turn: this.#game.getTurn().getCurrentTurn(),
+        turn: this.#game.getCurrentTurn(),
         colors: this.#game.getBoard().getColors()
       }
       localStorage.setItem('game', JSON.stringify(game));
@@ -118,10 +113,14 @@ export class GameView {
     });
   }
 
-  #addEventRecoverGame() {
+  #addEventButtonRecoverGame() {
     this.#recoverGame.addEventListener('click', () => {
       const game = JSON.parse(localStorage.getItem('game'));
       this.reset(game.humanPlayers, game.colors, game.turn);
     });
   }
 }
+
+window.onload = () => {
+  new GameView().init();
+};

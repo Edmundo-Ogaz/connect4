@@ -10,8 +10,6 @@ export class Human extends Player {
   }
 
   dropToken(column) {
-    console.log(`dropToken ${column}`);
-    console.log(`${JSON.stringify(super.board.getColors())}`);
     if (!Coordinate.isColumnValid(column)) 
       return `Remember columns between 1 and ${Coordinate.MAX_COLUMNS}`;
     if (this.isComplete(column)) 
@@ -19,7 +17,7 @@ export class Human extends Player {
     super.dropToken(column);
   }
 
-  accept(turnView) {
-    return turnView.visitHuman(this)
+  accept(turnView, column) {
+    return turnView.visitHuman(this, column)
   }
 }

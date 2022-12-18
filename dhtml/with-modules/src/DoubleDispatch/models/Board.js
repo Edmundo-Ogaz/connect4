@@ -2,7 +2,6 @@ import { assert } from '../utils/assert.js';
 import { Color } from './Color.js';
 import { Coordinate } from './Coordinate.js'
 import { Direction } from './Direction.js'
-import { Line } from './Line.js'
 
 export class Board {
 

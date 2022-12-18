@@ -1,7 +1,7 @@
-import { assert } from "../utils/assert.js";
-import { Coordinate } from "../model/Coordinate.js";
-import { Human } from "../model/Human.js";
-import { Random } from "../model/Random.js";
+import { assert } from "../../utils/assert.js";
+import { Coordinate } from "../../models/Coordinate.js";
+import { Human } from "../../models/Human.js";
+import { Random } from "../../models/Random.js";
 
 export class TurnView {
 

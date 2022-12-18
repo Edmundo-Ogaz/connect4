@@ -2,6 +2,7 @@ import { assert } from '../utils/assert.js';
 import { Color } from './Color.js';
 import { Coordinate } from './Coordinate.js'
 import { Direction } from './Direction.js'
+import { Line } from './Line.js'
 
 export class Board {
 
@@ -9,6 +10,7 @@ export class Board {
   #EMPTY_CELL = null;
   #colors;
   #currentCoordinate;
+  #line;
 
   constructor() {}
 
@@ -44,6 +46,10 @@ export class Board {
     return this.#colors;
   }
 
+  getLine() {
+    return this.#line;
+  }
+
   dropToken(column, color) {
     assert(Coordinate.NUMBER_COLUMNS.isIncluded(column));
     assert(Color.isColorValid(color));
@@ -70,12 +76,12 @@ export class Board {
       return false;
     }
     for (let direction of Direction.values()) {
-      let line = this.#getLine(this.#currentCoordinate, direction);
+      this.#line = this.#getLine(this.#currentCoordinate, direction);
       for (let i = 0; i < Board.LINE_LENGTH; i++) {
-        if (this.#isConnect4(line)) {
+        if (this.#isConnect4(this.#line)) {
           return true;
-        };
-        line = line.map(coordinate => coordinate.getShifted(direction.getOpposite().getCoordinate()));
+        }
+        this.#line = this.#line.map(coordinate => coordinate.getShifted(direction.getOpposite().getCoordinate()));
       }
     }
     return false;
@@ -104,7 +110,7 @@ export class Board {
   }
 
   #isConnect4(line) {
-    assert(line.length === Board.LINE_LENGTH)
+    assert(line.length === Board.LINE_LENGTH);
     for (let i = 0; i < Board.LINE_LENGTH; i++) {
       if (!line[i].isValid()) {
         return false;

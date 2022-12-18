@@ -1,7 +1,8 @@
-import { Coordinate } from '../model/Coordinate.js'
-import { Color } from '../model/Color.js'
-import { assert } from '../utils/assert.js';
-import { Turn } from '../model/Turn.js';
+import { assert } from '../../utils/assert.js';
+import { Coordinate } from '../../models/Coordinate.js'
+import { Color } from '../../models/Color.js'
+import { Turn } from '../../models/Turn.js';
+import { Board } from '../../models/Board.js';
 export class BoardView {
 
   #board;
@@ -52,7 +53,7 @@ export class BoardView {
   writeToken(currentColor, currentTurn) {
     assert(Color.isColorValid(currentColor));
     const currentCoordinate = this.#board.getCurrentCoordinate();
-    document.getElementById(`cell-${currentCoordinate.row}${currentCoordinate.column}`).classList.add(`has-${currentColor}`);
+    document.getElementById(`cell-${currentCoordinate.row}${currentCoordinate.column}`).classList.add(`board__cell--has-${currentColor}`);
     document.getElementById(`checker-${currentCoordinate.row}${currentCoordinate.column}`).checked = true;
     const ordinal = (currentTurn + 1) % Turn.MAX_PLAYERS;
     this.#existEventClick && this.#changeTurn(Color.get(ordinal));
@@ -66,5 +67,12 @@ export class BoardView {
       element.className = 'board__header board__cell';
       element.classList.add(`turn-${currentColor}`)
     })
+  }
+
+  highlightLineWinner(line) {
+    for (let i = 0; i < Board.LINE_LENGTH; i++) {
+      const coordinate = line[i];
+      document.querySelector(`#cell-${coordinate.row}${coordinate.column}`).classList.add('board__cell--highlight');
+    }
   }
 }

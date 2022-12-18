@@ -1,7 +1,6 @@
-import { assert } from "../utils/assert.js";
-import { Coordinate } from "../model/Coordinate.js";
-import { Game } from "../model/Game.js";
-import { Turn } from "../model/Turn.js";
+import { assert } from "../../utils/assert.js";
+import { Game } from "../../models/Game.js";
+import { Turn } from "../../models/Turn.js";
 import { BoardView } from "./BoardView.js";
 import { TurnView } from "./TurnView.js";
 
@@ -9,7 +8,7 @@ export class GameView {
 
   #game;
   #turnView;
-  #boarView;
+  #boardView;
 
   #dialogPlayers = document.querySelector('#dialog__players');
   #dialogFinished = document.querySelector('#dialog-yes-no');
@@ -20,24 +19,25 @@ export class GameView {
   constructor() {
     this.#game = new Game();
     this.#turnView = new TurnView(this.#game.getTurn());
-    this.#boarView = new BoardView(this.#game.getBoard(), this.#dropToken.bind(this));
+    this.#boardView = new BoardView(this.#game.getBoard(), this.#dropToken.bind(this));
     this.#addEnventButtonNewGame();
     this.#addEventDialogPlayers();
     this.#addEventDialogFinished();
     this.#addEventButtonSaveGame();
     this.#addEventButtonRecoverGame();
+    this.#init();
   }
 
-  init() {
+  #init() {
     this.#dialogPlayers.showModal();
   }
 
-  reset(humanPlayers, colors = null, currentTurn = 0) {
+  #reset(humanPlayers, colors = null, currentTurn = 0) {
     assert(Turn.isNumberPlayerValid(humanPlayers));
     assert(Turn.isNumberTurnValid(currentTurn));
     this.#game.reset(humanPlayers, colors, currentTurn);
     const currentColor = this.#game.getCurrentPlayer().getColor();
-    this.#boarView.reset(currentColor, humanPlayers > 0 ? true : false);
+    this.#boardView.reset(currentColor, humanPlayers > 0 ? true : false);
     this.#turnView.reset();
     this.#play();
   }
@@ -58,7 +58,7 @@ export class GameView {
   #dropToken(column) {
     assert(!this.#game.isFinished());
     this.#turnView.play(column);
-    this.#boarView.writeToken(this.#game.getCurrentPlayer().getColor(), this.#game.getCurrentTurn());
+    this.#boardView.writeToken(this.#game.getCurrentPlayer().getColor(), this.#game.getCurrentTurn());
     const gameFinished = this.#game.isFinished();
     if (!gameFinished) {
       this.#turnView.changeTurn();
@@ -70,7 +70,8 @@ export class GameView {
 
   #writeResult() {
     let msg;
-    if (this.#game.getBoard().isWinner()) {
+    if (this.#game.isWinner()) {
+      this.#boardView.highlightLineWinner(this.#game.getBoard().getLine());
       msg = `The winner is the player ${this.#game.getCurrentPlayer().getColor().toString().toUpperCase()}`;
     } else {
       msg = `Tied Game`;
@@ -80,13 +81,13 @@ export class GameView {
   }
 
   #addEnventButtonNewGame() {
-    this.#newGame.addEventListener('click', this.init.bind(this));
+    this.#newGame.addEventListener('click', this.#init.bind(this));
   }
 
   #addEventDialogPlayers() {
     this.#dialogPlayers.addEventListener('close', () => {
       const humanPlayers = this.#dialogPlayers.returnValue;
-      this.reset(humanPlayers);
+      this.#reset(humanPlayers);
       sessionStorage.setItem('humanPlayers', humanPlayers);
     });
   }
@@ -95,7 +96,7 @@ export class GameView {
     this.#dialogFinished.addEventListener('close', () => {
       const response = this.#dialogFinished.returnValue;
       if (response === 'yes') {
-        this.init();
+        this.#init();
       }
     });
   }
@@ -116,11 +117,11 @@ export class GameView {
   #addEventButtonRecoverGame() {
     this.#recoverGame.addEventListener('click', () => {
       const game = JSON.parse(localStorage.getItem('game'));
-      this.reset(game.humanPlayers, game.colors, game.turn);
+      this.#reset(game.humanPlayers, game.colors, game.turn);
     });
   }
 }
 
 window.onload = () => {
-  new GameView().init();
+  new GameView();
 };

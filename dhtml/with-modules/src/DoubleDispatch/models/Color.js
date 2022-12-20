@@ -13,10 +13,10 @@ export class Color {
   }
 
   static get(ordinal) {
-    return Color.#values()[ordinal];
+    return Color.values()[ordinal];
   }
 
-  static #values() {
+  static values() {
     return [Color.YELLOW, Color.RED];
   }
 

@@ -20,5 +20,8 @@
   "homepage": "https://github.com/Edmundo-Ogaz/connect4#readme",
   "dependencies": {
     "console-mpds": "^1.0.4"
+  },
+  "devDependencies": {
+    "cypress": "^12.0.2"
   }
 }

@@ -1,0 +1,111 @@
+@startuml connect4
+Connect4 *--> Board
+Connect4 *--> Turn
+Connect4 *--> BoardView
+Connect4 *--> TurnView
+Connect4 : + Connect4()
+Connect4 : - run()
+Connect4 : - playGame()
+Connect4 : - isResumed()
+Connect4 : + {static} main()
+
+interface PlayerVisitor
+PlayerVisitor <|.. TurnView
+PlayerVisitor : + visit(HumanPlayer)
+PlayerVisitor : + visit(RandomPlayer)
+PlayerVisitor : + visit(MinMaxPlayer)
+
+TurnView *--> Turn
+TurnView --> PlayerView
+TurnView : + TurnView(Turn)
+TurnView : + getNumberOfHumanPlayers()
+TurnView : + getMachineTypePlayer()
+TurnView : + play()
+TurnView : + writeResult()
+TurnView : + visit(HumanPlayer)
+TurnView : + visit(RandomPlayer)
+TurnView : + visit(MinMaxPlayer)
+
+abstract PlayerView
+PlayerView ..> Player
+PlayerView : + PlayerView(Player)
+PlayerView : + {abstract} int getColumn()
+PlayerView : + getPlayer()
+PlayerView <|-- HumanPlayerView
+PlayerView <|-- RandomPlayerView
+PlayerView <|-- MinMaxPlayerView
+
+HumanPlayerView : + HumanPlayerView(HumanPlayer)
+HumanPlayerView : + int getColumn()
+
+BoardView : {static} int BLANK_SPACES
+BoardView *--> Board
+BoardView : + BoardView(Board)
+BoardView : + void writeln()
+BoardView : - void writeHorizontal()
+
+Turn : {static} int NUMBER_PLAYERS
+Turn : - Player[] players
+Turn : - int activePlayer
+Turn : - int typeMachinePlayer
+Turn *--> Board
+Turn : + Turn(Board)
+Turn : + void setTypeMachine(type)
+Turn : + void reset(humanPlayers)
+Turn : + void play(column)
+Turn : + Player getActivePlayer()
+Turn : + Board getBoard()
+Turn : + int getNumberPlayers()
+
+abstract Player
+Player *--> Color
+Player *--> Board
+Player : + Player(color, board)
+Player : + void play(column)
+Player : + Color getColor()
+Player : + boolean isComplete(column)
+Player : + boolean getBoard()
+Player : + {abstract} void accept(PlayerVisitor)
+Player <|-- HumanPlayer
+Player <|-- RandomPlayer
+Player <|-- MinMaxPlayer
+
+HumanPlayer : + HumanPlayer(color, board)
+HumanPlayer : + void accept(visitor)
+
+RandomPlayer : + RandomPlayer(color, board)
+RandomPlayer : + void accept(visitor)
+RandomPlayer : + int getColumn()
+
+MinMaxPlayer : + MinMaxPlayer(color, board)
+MinMaxPlayer : + void accept(visitor)
+MinMaxPlayer : + int getColumn()
+
+Board : + {static} int LINE_LENGTH
+Board : - Color[][] colors
+Board : + Coordinate lastDrop
+Board : + Board()
+Board : + void reset()
+Board : + void dropToken(column, color)
+Board : + boolean isEmpty(int value)
+Board : + boolean isEmpty(Coordinate value)
+Board : + boolean isOccupied(coordinate, color)
+Board : + boolean isComplete()
+Board : + boolean isComplete(column)
+Board : + boolean isFinished()
+Board : + boolean isWinner()
+Board : - boolean setLine(line, direction)
+Board : - boolean shiftLine(line, direction)
+Board : - boolean isConnect4(line)
+
+enum Color
+Color : RED
+Color : YELLOW
+Color : NULL
+Color : - Color(name)
+Color : + {static} Color get(ordinal)
+Color : + getString()
+Color : + Color getOpposite()
+Color : + char getCode()
+
+@enduml

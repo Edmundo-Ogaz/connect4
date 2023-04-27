@@ -1,0 +1,214 @@
+@startuml connect4
+
+package framework {
+    class GameApp<G, V extends GameView<G>> {
+        # G game;
+        # V gameView;
+        # void play()
+    }
+
+    abstract class framework.GameView<G> {
+        # G game;
+        + GameView(game);
+        + {abstract} void start()
+        + {abstract} void play()
+        + {abstract} boolean resume()
+    }
+}
+
+package connect4 {
+    Connect4 --|> GameApp
+    Connect4 : + Connect4()
+    Connect4 : + {static} void main(args)
+
+    package connect4.views {
+        
+        GameView -|> framework.GameView 
+        GameView <-* Connect4
+        
+        GameView *-> BoardView
+        GameView *-> TurnView
+        GameView : + GameView(game)
+        GameView : + void start()
+        GameView : + void play()
+        GameView : + boolean resume()
+
+        TurnView o--> PlayerView
+        TurnView o--> PlayerViewPrototype
+        TurnView : + TurnView(turn)
+        TurnView : - void configTurn()
+        TurnView : + void play()
+        TurnView : + void writeResult()
+
+        PlayerView : # Turn
+        PlayerView : + PlayerView()
+        PlayerView : # void showWinner()
+        PlayerView : # void showPlayerTurn()
+        PlayerView : # {abstract} int getColumn()
+        PlayerView <|-- HumanPlayerView
+        PlayerView <|-- MachinePlayerView
+
+        PlayerViewPrototype : - playerViewAsoc
+        PlayerViewPrototype : PlayerViewPrototype(turn)
+        PlayerViewPrototype : PlayerView createView(playerType)
+
+        HumanPlayerView : + HumanPlayerView(turn)
+        HumanPlayerView : + int getColumn()
+
+        MachinePlayerView : + HumanPlayerView(turn)
+        MachinePlayerView : + int getColumn()
+        MachinePlayerView : + {abstract} void showColumnSelected(column)
+        MachinePlayerView <|-- RandomPlayerView
+        MachinePlayerView <|-- MinMaxPlayerView
+
+        MinMaxPlayerView : + MinMaxPlayerView(turn)
+        MinMaxPlayerView : + void showColumnSelected(column)
+
+        RandomPlayerView : + RandomPlayerView(turn)
+        RandomPlayerView : + void showColumnSelected(column)
+
+        BoardView : {static} int BLANK_SPACES
+        BoardView : + BoardView(board)
+        BoardView : + void writeln()
+        BoardView : + boolean isGameFinished()
+    }
+
+    package connect4.views.menu {
+
+        Menu : # title
+        Menu : # options
+        Menu o--> Option
+        Menu : + Menu(title)
+        Menu : + void interact()
+        Menu : # {abstract} void addOptions()
+        Menu : # void interact_()
+        Menu : # void showTitles()
+        Menu : # void showTitle()
+        Menu : # void execChoosedOption()
+        Menu : # void add(option)
+        Menu : # void removeOptions()
+        Menu : # boolean hasOption(option)
+        Menu <|-- LanguageMenu
+        Menu <|-- SequentialMenu
+
+        LanguageMenu <.. GameView
+        LanguageMenu : + LanguageMenu(title)
+        LanguageMenu : # void addOptions()
+        LanguageMenu ..> SpanishOption
+        LanguageMenu ..> EnglishOption
+
+        SequentialMenu : # steps
+        SequentialMenu : # counter
+        SequentialMenu : + SequentialMenu(title, steps)
+        SequentialMenu : + void interact()
+        SequentialMenu <|-- ConfigTurnMenu
+
+        ConfigTurnMenu <.. TurnView
+        ConfigTurnMenu : + ConfigTurnMenu(turn)
+        ConfigTurnMenu : # void addOptions()
+        ConfigTurnMenu : # void showTitle()
+        ConfigTurnMenu : # void execChoosedOption()
+        ConfigTurnMenu : + void interact()
+        ConfigTurnMenu ..> CreateHumanPlayerOption
+        ConfigTurnMenu ..> CreateRandomPlayerOption
+        ConfigTurnMenu ..> CreateAIPlayerOption
+
+        Option : # title
+        Option : + Option(title)
+        Option : + {abstract} void interact()
+        Option : + void showTitle(index)
+        Option : # String getTitle()
+        Option <|-- LanguageOption
+
+        LanguageOption *--> MessageManager
+        LanguageOption : + LanguageOption(title)
+        LanguageOption <|-- SpanishOption
+        LanguageOption <|-- EnglishOption
+
+        SpanishOption : + SpanishOption()
+        SpanishOption : + void interact()
+
+        EnglishOption : + EnglishOption()
+        EnglishOption : + void interact()
+
+        class MessageManager << Singleton >>
+
+    }
+
+    package connect4.models {
+        Game <-* Connect4 
+        Game *-> Board
+        Game *-> Turn
+        Game : + Game()
+        Game : + void reset()
+        Game : + Board getBoard()
+        Game : + Turn getTurn()
+
+        Turn <--* TurnView
+        Turn o--> Player
+        Turn : {static} int NUMBER_PLAYERS
+        Turn : - Player[] players
+        Turn : - int activePlayer
+        Turn *--> Board
+        Turn : + Turn(board)
+        Turn : + void resetPlayers()
+        Turn : + void reset()
+        Turn : + void play(column)
+        Turn : + Player getActivePlayer()
+        Turn : + Board getBoard()
+        Turn : + int getNumberPlayers()
+        Turn : + void addPlayer(player)
+        Turn : + PlayerType getType()
+        Turn : + int getActivePlayerIndex()
+        Turn : + int activePlayerIndex()
+        Turn : + Player[] getPlayers()
+        Turn : + void setPlayers(players)
+
+        abstract Player
+        Player o--> Color
+        Player *--> Board
+        Player o--> PlayerType
+        Player : + Player(board)
+        Player : + void play(column)
+        Player : + Color getColor()
+        Player : + void setColor(color)
+        Player : + boolean isComplete(column)
+        Player : + boolean getBoard()
+        Player :  PlayerType getType()
+        Player <|-- HumanPlayer
+        Player <|-- MachinePlayer
+
+        HumanPlayer : + HumanPlayer(board)
+
+        MachinePlayer : + MachinePlayer(board)
+        MachinePlayer : + int getColumn()
+        MachinePlayer <|-- RandomPlayer
+        MachinePlayer <|-- MinMaxPlayer
+
+        RandomPlayer : + RandomPlayer(board)
+        RandomPlayer : + int getColumn()
+
+        MinMaxPlayer : + MinMaxPlayer(board)
+        MinMaxPlayer : + int getColumn()
+
+        Board <--* BoardView
+        Board : + {static} int LINE_LENGTH
+        Board : - Color[][] colors
+        Board : + Coordinate lastDrop
+        Board : + Board()
+        Board : + void reset()
+        Board : + void dropToken(column, color)
+        Board : + boolean isEmptyPosition(coordinate)
+        Board : + boolean isCompleteColumn(column)
+        Board : + boolean isGameFinished()
+        Board : + boolean isWinner()
+        Board : + boolean getColor(coordinate)
+        Board : + Color[][] getColors()
+        Board : + Coordinate getLastDrop()
+        Board : + void setColors(colors)
+        Board : + void setLastDrop(lastDrop)
+    }
+
+}
+
+@enduml

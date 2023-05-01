@@ -11,7 +11,7 @@ public class TurnView {
     public TurnView(Turn turn) {
         this.turn = turn;
         this.configTurn();
-        this.playerViewPrototype = new PlayerViewPrototype(this.turn);
+        this.playerViewPrototype = new PlayerViewPrototype();
     }
 
     private void configTurn() {
@@ -19,7 +19,7 @@ public class TurnView {
     }
 
     public void play() {
-        this.activePlayerView = this.playerViewPrototype.createView(this.turn.getType());
+        this.activePlayerView = this.playerViewPrototype.createView(this.turn.getActivePlayer());
         this.activePlayerView.showPlayerTurn();
         this.turn.play(this.activePlayerView.getColumn());
     }

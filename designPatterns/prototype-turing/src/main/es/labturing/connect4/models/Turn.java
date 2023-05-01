@@ -1,7 +1,5 @@
 package main.es.labturing.connect4.models;
 
-import main.es.labturing.connect4.types.PlayerType;
-
 public class Turn {
     final static int NUMBER_PLAYERS = 2;
     private Player[] players;
@@ -51,10 +49,6 @@ public class Turn {
                 playerSetted = true;
             }
         }
-    }
-
-    public PlayerType getType() {
-        return this.getActivePlayer().getType();
     }
 
     public int getActivePlayerIndex() {

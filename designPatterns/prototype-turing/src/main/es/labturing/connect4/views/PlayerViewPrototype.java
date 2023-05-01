@@ -1,22 +1,24 @@
 package main.es.labturing.connect4.views;
 
-import main.es.labturing.connect4.models.Turn;
+import main.es.labturing.connect4.models.Player;
 import main.es.labturing.connect4.types.PlayerType;
 
 import java.util.HashMap;
 
 public class PlayerViewPrototype {
 
-    private HashMap<PlayerType, PlayerView> playerViewAsoc;
+    private HashMap<PlayerType, PlayerView> playerViewMap;
 
-    PlayerViewPrototype(Turn turn) {
-        this.playerViewAsoc = new HashMap<>();
-        this.playerViewAsoc.put(PlayerType.HUMAN, new HumanPlayerView(turn));
-        this.playerViewAsoc.put(PlayerType.RANDOM, new RandomPlayerView(turn));
-        this.playerViewAsoc.put(PlayerType.MINMAX, new MinMaxPlayerView(turn));
+    PlayerViewPrototype() {
+        this.playerViewMap = new HashMap<>();
+        this.playerViewMap.put(PlayerType.HUMAN, new HumanPlayerView());
+        this.playerViewMap.put(PlayerType.RANDOM, new RandomPlayerView());
+        this.playerViewMap.put(PlayerType.MINMAX, new MinMaxPlayerView());
     }
 
-    PlayerView createView(PlayerType playerType) {
-        return this.playerViewAsoc.get(playerType);
+    PlayerView createView(Player activePlayer) {
+        PlayerView playerView = this.playerViewMap.get(activePlayer.getType());
+        playerView.setPlayer(activePlayer);
+        return playerView;
     }
 }

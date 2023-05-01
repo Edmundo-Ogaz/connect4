@@ -9,16 +9,16 @@ public class ColorView {
         this.color = color;
 
     }
+    
+    public void write() {
+        MessageManager.getInstance().write("PLAYER_COLOR", this.getCode());
+    }
 
-    public char getCode() {
+    private char getCode() {
         if (this.color == Color.NULL) {
             return ' ';
         }
         return MessageManager.getInstance().getMessage(this.color.name()).charAt(0);
-    }
-
-    public void write() {
-        MessageManager.getInstance().write("PLAYER_COLOR", this.getCode());
     }
 
     public String toString() {

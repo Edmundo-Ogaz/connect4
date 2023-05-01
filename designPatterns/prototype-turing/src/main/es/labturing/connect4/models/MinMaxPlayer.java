@@ -11,7 +11,10 @@ public class MinMaxPlayer extends MachinePlayer {
 
     public MinMaxPlayer(Board board) {
         super(board);
-        this.type = PlayerType.MINMAX;
+    }
+
+    public PlayerType getType() {
+        return PlayerType.MINMAX;
     }
 
     public int getColumn() {

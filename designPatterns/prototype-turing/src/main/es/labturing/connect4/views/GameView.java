@@ -14,7 +14,6 @@ public class GameView extends main.es.labturing.utils.framework.GameView<Game> {
         new LanguageMenu("SELECT LANGUAGE:").interact();
         this.boardView = new BoardView(game.getBoard());
         this.turnView = new TurnView(game.getTurn());
-
     }
 
     public void start() {

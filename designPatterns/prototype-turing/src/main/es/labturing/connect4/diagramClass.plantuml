@@ -1,213 +1,213 @@
 @startuml connect4
 
-package framework {
-    class GameApp<G, V extends GameView<G>> {
-        # G game;
-        # V gameView;
-        # void play()
-    }
+class framework.GameApp<G, V extends framework.GameView<G>> {
+    # G game;
+    # V gameView;
+    # void play()
+}
 
-    abstract class framework.GameView<G> {
-        # G game;
-        + GameView(game);
-        + {abstract} void start()
-        + {abstract} void play()
-        + {abstract} boolean resume()
-    }
+abstract class framework.GameView<G> {
+    # G game;
+    + {abstract} void start()
+    + {abstract} void play()
+    + {abstract} boolean resume()
 }
 
 package connect4 {
-    Connect4 --|> GameApp
-    Connect4 : + Connect4()
+    Connect4 --|> framework.GameApp
     Connect4 : + {static} void main(args)
+    Connect4 *--> GameView
+    Connect4 *--> Game
 
-    package connect4.views {
-        
-        GameView -|> framework.GameView 
-        GameView <-* Connect4
-        
-        GameView *-> BoardView
-        GameView *-> TurnView
-        GameView : + GameView(game)
-        GameView : + void start()
-        GameView : + void play()
-        GameView : + boolean resume()
+    GameView -|> framework.GameView
+    GameView *-> BoardView
+    GameView *-> TurnView
+    GameView *-> Game
+    GameView : + void start()
+    GameView : + void play()
+    GameView : + boolean resume()
+    GameView ..> YesNoDialog
+    GameView ..> LanguageMenu
 
-        TurnView o--> PlayerView
-        TurnView o--> PlayerViewPrototype
-        TurnView : + TurnView(turn)
-        TurnView : - void configTurn()
-        TurnView : + void play()
-        TurnView : + void writeResult()
+    TurnView *--> Turn
+    TurnView --> PlayerView
+    TurnView *--> PlayerViewPrototype
+    TurnView : - void configTurn()
+    TurnView : + void play()
+    TurnView : + void writeResult()
+    TurnView ..> ConfigTurnMenu
 
-        PlayerView : # Turn
-        PlayerView : + PlayerView()
-        PlayerView : # void showWinner()
-        PlayerView : # void showPlayerTurn()
-        PlayerView : # {abstract} int getColumn()
-        PlayerView <|-- HumanPlayerView
-        PlayerView <|-- MachinePlayerView
+    abstract class PlayerView
+    PlayerView --> Player
+    PlayerView : # void showWinner()
+    PlayerView : # void showPlayerTurn()
+    PlayerView : # {abstract} int getColumn()
+    PlayerView : + void setPlayer(player)
+    PlayerView <|-- HumanPlayerView
+    PlayerView <|-- MachinePlayerView
 
-        PlayerViewPrototype : - playerViewAsoc
-        PlayerViewPrototype : PlayerViewPrototype(turn)
-        PlayerViewPrototype : PlayerView createView(playerType)
+    HumanPlayerView : + int getColumn()
 
-        HumanPlayerView : + HumanPlayerView(turn)
-        HumanPlayerView : + int getColumn()
+    abstract class MachinePlayerView
+    MachinePlayerView : + int getColumn()
+    MachinePlayerView : + {abstract} void showColumnSelected(column)
+    MachinePlayerView <|-- RandomPlayerView
+    MachinePlayerView <|-- MinMaxPlayerView
 
-        MachinePlayerView : + HumanPlayerView(turn)
-        MachinePlayerView : + int getColumn()
-        MachinePlayerView : + {abstract} void showColumnSelected(column)
-        MachinePlayerView <|-- RandomPlayerView
-        MachinePlayerView <|-- MinMaxPlayerView
+    MinMaxPlayerView : + void showColumnSelected(column)
 
-        MinMaxPlayerView : + MinMaxPlayerView(turn)
-        MinMaxPlayerView : + void showColumnSelected(column)
+    RandomPlayerView : + void showColumnSelected(column)
 
-        RandomPlayerView : + RandomPlayerView(turn)
-        RandomPlayerView : + void showColumnSelected(column)
+    PlayerViewPrototype : - playerViewMap
+    PlayerViewPrototype : PlayerView createView(activePlayer)
+    PlayerViewPrototype ..> HumanPlayerView
+    PlayerViewPrototype ..> RandomPlayerView
+    PlayerViewPrototype ..> MinMaxPlayerView
+    PlayerViewPrototype ..> PlayerType
 
-        BoardView : {static} int BLANK_SPACES
-        BoardView : + BoardView(board)
-        BoardView : + void writeln()
-        BoardView : + boolean isGameFinished()
-    }
+    BoardView : {static} int BLANK_SPACES
+    BoardView *--> Board
+    BoardView : + void writeln()
+    BoardView : + boolean isGameFinished()
 
-    package connect4.views.menu {
+    Game *-> Board
+    Game *-> Turn
+    Game : + void reset()
+    Game : + Board getBoard()
+    Game : + Turn getTurn()
 
-        Menu : # title
-        Menu : # options
-        Menu o--> Option
-        Menu : + Menu(title)
-        Menu : + void interact()
-        Menu : # {abstract} void addOptions()
-        Menu : # void interact_()
-        Menu : # void showTitles()
-        Menu : # void showTitle()
-        Menu : # void execChoosedOption()
-        Menu : # void add(option)
-        Menu : # void removeOptions()
-        Menu : # boolean hasOption(option)
-        Menu <|-- LanguageMenu
-        Menu <|-- SequentialMenu
+    Turn o--> Player
+    Turn *--> Board
+    Turn : {static} int NUMBER_PLAYERS
+    Turn : - int activePlayer
+    Turn : + void resetPlayers()
+    Turn : + void reset()
+    Turn : + void play(column)
+    Turn : + Player getActivePlayer()
+    Turn : + Board getBoard()
+    Turn : + int getNumberPlayers()
+    Turn : + void addPlayer(player)
+    Turn : + int getActivePlayerIndex()
+    Turn : + int activePlayerIndex()
+    Turn : + Player[] getPlayers()
+    Turn : + void setPlayers(players)
 
-        LanguageMenu <.. GameView
-        LanguageMenu : + LanguageMenu(title)
-        LanguageMenu : # void addOptions()
-        LanguageMenu ..> SpanishOption
-        LanguageMenu ..> EnglishOption
+    abstract Player
+    Player o--> Color
+    Player *--> Board
+    Player : + Player(board)
+    Player : + void play(column)
+    Player : + Color getColor()
+    Player : + void setColor(color)
+    Player : + boolean isComplete(column)
+    Player : + boolean getBoard()
+    Player : + {abstract} PlayerType getType()
+    Player <|-- HumanPlayer
+    Player <|-- MachinePlayer
 
-        SequentialMenu : # steps
-        SequentialMenu : # counter
-        SequentialMenu : + SequentialMenu(title, steps)
-        SequentialMenu : + void interact()
-        SequentialMenu <|-- ConfigTurnMenu
+    HumanPlayer : + HumanPlayer(board)
+    HumanPlayer : + PlayerType getType()
 
-        ConfigTurnMenu <.. TurnView
-        ConfigTurnMenu : + ConfigTurnMenu(turn)
-        ConfigTurnMenu : # void addOptions()
-        ConfigTurnMenu : # void showTitle()
-        ConfigTurnMenu : # void execChoosedOption()
-        ConfigTurnMenu : + void interact()
-        ConfigTurnMenu ..> CreateHumanPlayerOption
-        ConfigTurnMenu ..> CreateRandomPlayerOption
-        ConfigTurnMenu ..> CreateAIPlayerOption
+    MachinePlayer : + MachinePlayer(board)
+    MachinePlayer : + int getColumn()
+    MachinePlayer <|-- RandomPlayer
+    MachinePlayer <|-- MinMaxPlayer
 
-        Option : # title
-        Option : + Option(title)
-        Option : + {abstract} void interact()
-        Option : + void showTitle(index)
-        Option : # String getTitle()
-        Option <|-- LanguageOption
+    RandomPlayer : + RandomPlayer(board)
+    RandomPlayer : + int getColumn()
+    RandomPlayer : + PlayerType getType()
 
-        LanguageOption *--> MessageManager
-        LanguageOption : + LanguageOption(title)
-        LanguageOption <|-- SpanishOption
-        LanguageOption <|-- EnglishOption
+    MinMaxPlayer : + MinMaxPlayer(board)
+    MinMaxPlayer : + int getColumn()
+    MinMaxPlayer : + PlayerType getType()
 
-        SpanishOption : + SpanishOption()
-        SpanishOption : + void interact()
+    Board : + {static} int LINE_LENGTH
+    Board : - Color[][] colors
+    Board : + Coordinate lastDrop
+    Board : + Board()
+    Board : + void reset()
+    Board : + void dropToken(column, color)
+    Board : + boolean isEmptyPosition(coordinate)
+    Board : + boolean isCompleteColumn(column)
+    Board : + boolean isGameFinished()
+    Board : + boolean isWinner()
+    Board : + boolean getColor(coordinate)
+    Board : + Color[][] getColors()
+    Board : + Coordinate getLastDrop()
+    Board : + void setColors(colors)
+    Board : + void setLastDrop(lastDrop)
 
-        EnglishOption : + EnglishOption()
-        EnglishOption : + void interact()
+    abstract class Menu
+    Menu : # title
+    Menu : # options
+    Menu o--> Option
+    Menu : + Menu(title)
+    Menu : + void interact()
+    Menu : # {abstract} void addOptions()
+    Menu : # void interact_()
+    Menu : # void showTitles()
+    Menu : # void showTitle()
+    Menu : # void execChoosedOption()
+    Menu : # void add(option)
+    Menu : # void removeOptions()
+    Menu : # boolean hasOption(option)
+    Menu <|-- SequentialMenu
+    Menu <|-- LanguageMenu
 
-        class MessageManager << Singleton >>
+    class LanguageMenu << Invoker >>
+    LanguageMenu : + LanguageMenu(title)
+    LanguageMenu : # void addOptions()
+    LanguageMenu ..> SpanishOption
+    LanguageMenu ..> EnglishOption
 
-    }
+    SequentialMenu : # steps
+    SequentialMenu : # counter
+    SequentialMenu : + SequentialMenu(title, steps)
+    SequentialMenu : + void interact()
+    SequentialMenu <|-- ConfigTurnMenu
 
-    package connect4.models {
-        Game <-* Connect4 
-        Game *-> Board
-        Game *-> Turn
-        Game : + Game()
-        Game : + void reset()
-        Game : + Board getBoard()
-        Game : + Turn getTurn()
+    ConfigTurnMenu *--> Turn
+    ConfigTurnMenu : + ConfigTurnMenu(turn)
+    ConfigTurnMenu : # void addOptions()
+    ConfigTurnMenu : # void showTitle()
+    ConfigTurnMenu : # void execChoosedOption()
+    ConfigTurnMenu : + void interact()
+    ConfigTurnMenu ..> CreateHumanPlayerOption
+    ConfigTurnMenu ..> CreateRandomPlayerOption
+    ConfigTurnMenu ..> CreateAIPlayerOption
 
-        Turn <--* TurnView
-        Turn o--> Player
-        Turn : {static} int NUMBER_PLAYERS
-        Turn : - Player[] players
-        Turn : - int activePlayer
-        Turn *--> Board
-        Turn : + Turn(board)
-        Turn : + void resetPlayers()
-        Turn : + void reset()
-        Turn : + void play(column)
-        Turn : + Player getActivePlayer()
-        Turn : + Board getBoard()
-        Turn : + int getNumberPlayers()
-        Turn : + void addPlayer(player)
-        Turn : + PlayerType getType()
-        Turn : + int getActivePlayerIndex()
-        Turn : + int activePlayerIndex()
-        Turn : + Player[] getPlayers()
-        Turn : + void setPlayers(players)
+    abstract class Option
+    Option : # title
+    Option : + Option(title)
+    Option : + {abstract} void interact()
+    Option : + void showTitle(index)
+    Option : # String getTitle()
+    Option <|-- LanguageOption
 
-        abstract Player
-        Player o--> Color
-        Player *--> Board
-        Player o--> PlayerType
-        Player : + Player(board)
-        Player : + void play(column)
-        Player : + Color getColor()
-        Player : + void setColor(color)
-        Player : + boolean isComplete(column)
-        Player : + boolean getBoard()
-        Player :  PlayerType getType()
-        Player <|-- HumanPlayer
-        Player <|-- MachinePlayer
+    LanguageOption : + LanguageOption(title)
+    LanguageOption <|-- SpanishOption
+    LanguageOption <|-- EnglishOption
 
-        HumanPlayer : + HumanPlayer(board)
+    class SpanishOption << Command >>
+    SpanishOption : + SpanishOption()
+    SpanishOption : + void interact()
 
-        MachinePlayer : + MachinePlayer(board)
-        MachinePlayer : + int getColumn()
-        MachinePlayer <|-- RandomPlayer
-        MachinePlayer <|-- MinMaxPlayer
+    class EnglishOption << Command >>
+    EnglishOption : + EnglishOption()
+    EnglishOption : + void interact()
 
-        RandomPlayer : + RandomPlayer(board)
-        RandomPlayer : + int getColumn()
+    CreateHumanPlayerOption --|> ConfigTurnOption
+    CreateHumanPlayerOption : + void interact()
 
-        MinMaxPlayer : + MinMaxPlayer(board)
-        MinMaxPlayer : + int getColumn()
+    CreateRandomPlayerOption --|> ConfigTurnOption
+    CreateRandomPlayerOption : + void interact()
 
-        Board <--* BoardView
-        Board : + {static} int LINE_LENGTH
-        Board : - Color[][] colors
-        Board : + Coordinate lastDrop
-        Board : + Board()
-        Board : + void reset()
-        Board : + void dropToken(column, color)
-        Board : + boolean isEmptyPosition(coordinate)
-        Board : + boolean isCompleteColumn(column)
-        Board : + boolean isGameFinished()
-        Board : + boolean isWinner()
-        Board : + boolean getColor(coordinate)
-        Board : + Color[][] getColors()
-        Board : + Coordinate getLastDrop()
-        Board : + void setColors(colors)
-        Board : + void setLastDrop(lastDrop)
-    }
+    CreateAIPlayerOption --|> ConfigTurnOption
+    CreateAIPlayerOption : + void interact()
+
+    ConfigTurnOption --|> Option
+    ConfigTurnOption *--> Turn
+    ConfigTurnOption : + ConfigTurnOption(title, turn)
 
 }
 

@@ -5,7 +5,6 @@ import main.es.labturing.connect4.types.PlayerType;
 public abstract class Player {
     private Color color;
     private Board board;
-    protected PlayerType type;
 
     public Player(Board board) {
         this.board = board;
@@ -31,9 +30,5 @@ public abstract class Player {
         return this.board;
     }
 
-    PlayerType getType() {
-        return this.type;
-    }
-
-    //public abstract void accept(PlayerVisitor visitor);
+    public abstract PlayerType getType();
 }

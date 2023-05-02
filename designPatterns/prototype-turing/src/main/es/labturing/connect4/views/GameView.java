@@ -17,6 +17,7 @@ public class GameView extends main.es.labturing.utils.framework.GameView<Game> {
     }
 
     public void start() {
+        this.turnView.configTurn();
         MessageManager.getInstance().writeln("GAME_TITLE");
         this.boardView.writeln();
     }

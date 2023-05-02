@@ -1,5 +1,9 @@
 package main.es.labturing.connect4.models;
 
+import main.es.labturing.connect4.types.Color;
+import main.es.labturing.connect4.types.Coordinate;
+import main.es.labturing.connect4.types.Direction;
+
 public class DraftBoard extends Board {
 
     public DraftBoard(Board board) {

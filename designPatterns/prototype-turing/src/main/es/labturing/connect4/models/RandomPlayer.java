@@ -1,5 +1,6 @@
 package main.es.labturing.connect4.models;
 
+import main.es.labturing.connect4.types.Coordinate;
 import main.es.labturing.connect4.types.PlayerType;
 
 public class RandomPlayer extends MachinePlayer {

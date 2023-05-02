@@ -10,11 +10,10 @@ public class TurnView {
 
     public TurnView(Turn turn) {
         this.turn = turn;
-        this.configTurn();
         this.playerViewPrototype = new PlayerViewPrototype();
     }
 
-    private void configTurn() {
+    public void configTurn() {
         new ConfigTurnMenu(this.turn).interact();
     }
 

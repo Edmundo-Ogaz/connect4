@@ -1,6 +1,6 @@
 package main.es.labturing.connect4.views;
 
-import main.es.labturing.connect4.models.Coordinate;
+import main.es.labturing.connect4.types.Coordinate;
 import main.es.labturing.utils.views.ClosedIntervalDialog;
 
 public class HumanPlayerView extends PlayerView {

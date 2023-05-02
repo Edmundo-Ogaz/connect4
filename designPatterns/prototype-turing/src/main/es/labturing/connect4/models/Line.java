@@ -1,5 +1,8 @@
 package main.es.labturing.connect4.models;
 
+import main.es.labturing.connect4.types.Coordinate;
+import main.es.labturing.connect4.types.Direction;
+
 public class Line {
 
     private int length;

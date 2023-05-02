@@ -32,7 +32,7 @@ package connect4 {
     TurnView *--> Turn
     TurnView --> PlayerView
     TurnView *--> PlayerViewPrototype
-    TurnView : - void configTurn()
+    TurnView : + void configTurn()
     TurnView : + void play()
     TurnView : + void writeResult()
     TurnView ..> ConfigTurnMenu

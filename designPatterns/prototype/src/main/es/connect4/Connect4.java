@@ -2,14 +2,20 @@ package main.es.connect4;
 
 import main.es.connect4.models.Game;
 import main.es.connect4.views.GameView;
-import main.es.utils.framework.GameApp;
 
-public class Connect4 extends GameApp<Game, GameView> {
+public class Connect4 {
+
+    protected GameView gameView;
 
     private Connect4() {
-        this.game = new Game();
-        this.gameView = new GameView(this.game);
+        this.gameView = new GameView(new Game());
+    }
 
+    private void play() {
+        do {
+            this.gameView.start();
+            this.gameView.play();
+        } while (this.gameView.resume());
     }
 
     public static void main(final String[] args) {

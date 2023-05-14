@@ -4,15 +4,14 @@ import main.es.connect4.models.Game;
 import main.es.connect4.views.menu.LanguageMenu;
 import main.es.utils.views.YesNoDialog;
 
-public class GameView {
+public class GameView extends main.es.utils.framework.GameView<Game> {
 
-    private Game game;
     private BoardView boardView;
     private TurnView turnView;
 
     public GameView(Game game) {
+        super(game);
         new LanguageMenu("SELECT LANGUAGE:").interact();
-        this.game = game;
         this.boardView = new BoardView(game.getBoard());
         this.turnView = new TurnView(game.getTurn());
     }

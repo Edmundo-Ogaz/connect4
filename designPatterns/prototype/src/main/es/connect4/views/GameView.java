@@ -11,8 +11,8 @@ public class GameView {
     private TurnView turnView;
 
     public GameView(Game game) {
-        new LanguageMenu("SELECT LANGUAGE:").interact();
         this.game = game;
+        new LanguageMenu("SELECT LANGUAGE:").interact();
         this.boardView = new BoardView(game.getBoard());
         this.turnView = new TurnView(game.getTurn());
     }

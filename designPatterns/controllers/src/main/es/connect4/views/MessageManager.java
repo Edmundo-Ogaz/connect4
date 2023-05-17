@@ -32,7 +32,7 @@ public class MessageManager {
 
     private void readFile() throws FileNotFoundException, IOException {
         //String path = "tech-java-orientadoObjetos/src/main/es/labturing/connect4/resources/";
-        String path = "connect4/designPatterns/prototype/src/main/es/connect4/resources/";
+        String path = "src/main/es/connect4/resources/";
         BufferedReader input = new BufferedReader(new FileReader(path+this.language.getFileName()));
         String line;
         while ((line = input.readLine()) != null) {

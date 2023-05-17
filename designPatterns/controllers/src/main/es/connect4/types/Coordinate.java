@@ -1,6 +1,6 @@
 package main.es.connect4.types;
 
-import main.es.utils.models.ClosedInterval;
+import main.es.connect4.types.ClosedInterval;
 
 public class Coordinate {
     public static Coordinate ORIGIN = new Coordinate(0, 0);

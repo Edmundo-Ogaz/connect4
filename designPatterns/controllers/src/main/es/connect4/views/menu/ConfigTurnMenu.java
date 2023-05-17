@@ -1,5 +1,7 @@
 package main.es.connect4.views.menu;
 
+import main.es.connect4.controllers.Controller;
+import main.es.connect4.controllers.Logic;
 import main.es.connect4.models.Turn;
 import main.es.connect4.types.Color;
 import main.es.connect4.views.ColorView;
@@ -9,18 +11,18 @@ import main.es.utils.views.menu.IterativeMenu;
 
 public class ConfigTurnMenu extends IterativeMenu {
 
-    private Turn turn;
+    private Logic logic;
 
-    public ConfigTurnMenu(Turn turn) {
-        super("", turn.getNumberPlayers());
-        this.turn = turn;
+    public ConfigTurnMenu(Logic logic) {
+        super("", logic.getNumberPlayers());
+        this.logic = logic;
     }
 
     @Override
     protected void addOptions() {
-        this.add(new CreateHumanPlayerOption(this.turn));
-        this.add(new CreateRandomPlayerOption(this.turn));
-        this.add(new CreateAIPlayerOption(this.turn));
+        this.add(new CreateHumanPlayerOption(this.logic.getTurn()));
+        this.add(new CreateRandomPlayerOption(this.logic.getTurn()));
+        this.add(new CreateAIPlayerOption(this.logic.getTurn()));
     }
 
     @Override
@@ -45,7 +47,7 @@ public class ConfigTurnMenu extends IterativeMenu {
 
     public void interact() {
         super.interact();
-        this.turn.reset();
+        this.logic.reset();
     }
 
 }

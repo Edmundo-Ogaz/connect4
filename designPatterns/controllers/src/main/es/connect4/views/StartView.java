@@ -1,22 +1,19 @@
-package main.es.connect4.views.console;
+package main.es.connect4.views;
 
-import main.es.connect4.controllers.StartController;
-//import main.es.connect4.views.Message;
+import main.es.connect4.controllers.Logic;
 
 class StartView {
 
-    private StartController startController;
+    private Logic logic;
 
-    StartView(StartController startController) {
-        this.startController = startController;
+    StartView(Logic logic) {
+        this.logic = logic;
     }
 
     void interact() {
-        new MessageView().writeln(Message.TITLE);
-        new BoardView().write(this.startController);
-        // this.turnView.configTurn();
-        // MessageManager.getInstance().writeln("GAME_TITLE");
-        // this.boardView.writeln();
+        new TurnView(this.logic).configTurn();
+        MessageManager.getInstance().writeln("GAME_TITLE");
+        new BoardView(this.logic).writeln();
     }
 
 }

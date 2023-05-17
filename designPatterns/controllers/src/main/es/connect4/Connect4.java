@@ -1,21 +1,17 @@
 package main.es.connect4;
 
 import main.es.connect4.models.Game;
-import main.es.connect4.controllers.StartController;
-import main.es.connect4.controllers.PlayController;
-import main.es.connect4.controllers.ResumeController;
+import main.es.connect4.controllers.Logic;
 import main.es.connect4.views.GameView;
 
 public class Connect4 {
 
-    protected GameView gameView;
+    private final Logic logic;
+    private final GameView gameView;
 
     public Connect4() {
-        Game game = new Game();
-        StartController startController = new StartController(game);
-        PlayController playController = new PlayController(game);
-        ResumeController resumeController = new ResumeController(game);
-        this.gameView = new GameView(startController, playController, resumeController);
+        this.logic = new Logic(new Game());
+        this.gameView = new GameView(this.logic);
     }
 
     private void play() {

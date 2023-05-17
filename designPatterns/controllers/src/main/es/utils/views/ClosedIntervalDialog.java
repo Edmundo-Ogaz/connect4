@@ -1,6 +1,6 @@
 package main.es.utils.views;
 
-import main.es.utils.models.ClosedInterval;
+import main.es.connect4.types.ClosedInterval;
 
 public class ClosedIntervalDialog extends IntDialog {
 

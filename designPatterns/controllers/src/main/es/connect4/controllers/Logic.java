@@ -6,12 +6,18 @@ import main.es.connect4.models.Turn;
 import main.es.connect4.types.Color;
 import main.es.connect4.types.Coordinate;
 
-public abstract class Controller {
+public class Logic {
 
     protected Game game;
+    private StartController startController;
+    private PlayController playController;
+    private ResumeController resumeController;
 
-    Controller(Game game) {
+    public Logic(Game game) {
         this.game = game;
+        this.startController = new StartController(this.game);
+        this.playController = new PlayController(this.game);
+        this.resumeController = new ResumeController(this.game);
     }
 
     public Game getGame() {
@@ -40,6 +46,10 @@ public abstract class Controller {
 
     public void reset() {
         this.game.getTurn().reset();
+    }
+
+    public void resetGame() {
+        this.game.reset();
     }
 
     public Player getActivePlayer() {

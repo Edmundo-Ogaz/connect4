@@ -1,14 +1,14 @@
 package main.es.connect4.views.menu;
 
-import main.es.connect4.models.Turn;
+import main.es.connect4.controllers.Logic;
 import main.es.utils.views.menu.Option;
 
 public abstract class ConfigTurnOption extends Option{
 
-    protected Turn turn;
+    protected Logic logic;
 
-    public ConfigTurnOption(String title, Turn turn) {
+    public ConfigTurnOption(String title, Logic logic) {
         super(title);
-        this.turn = turn;
+        this.logic = logic;
     }  
 }

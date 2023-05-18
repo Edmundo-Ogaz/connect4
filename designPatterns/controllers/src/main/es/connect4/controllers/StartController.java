@@ -1,5 +1,6 @@
 package main.es.connect4.controllers;
 
+import main.es.connect4.models.Board;
 import main.es.connect4.models.Game;
 import main.es.connect4.models.Player;
 import main.es.connect4.types.Color;
@@ -12,6 +13,10 @@ public class StartController extends Controller {
     public StartController(Game game) {
         super(game);
         new LanguageMenu("SELECT LANGUAGE:").interact();
+    }
+
+    public Board getBoard() {
+        return this.game.getBoard();
     }
 
     public Color getColor(Coordinate coordinate) {

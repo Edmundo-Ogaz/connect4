@@ -20,9 +20,9 @@ public class ConfigTurnMenu extends IterativeMenu {
 
     @Override
     protected void addOptions() {
-        this.add(new CreateHumanPlayerOption(this.logic.getTurn()));
-        this.add(new CreateRandomPlayerOption(this.logic.getTurn()));
-        this.add(new CreateAIPlayerOption(this.logic.getTurn()));
+        this.add(new CreateHumanPlayerOption(this.logic));
+        this.add(new CreateRandomPlayerOption(this.logic));
+        this.add(new CreateAIPlayerOption(this.logic));
     }
 
     @Override

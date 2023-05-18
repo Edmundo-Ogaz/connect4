@@ -1,17 +1,17 @@
 package main.es.connect4.views.menu;
 
+import main.es.connect4.controllers.Logic;
 import main.es.connect4.models.HumanPlayer;
-import main.es.connect4.models.Turn;
 import main.es.connect4.views.MessageManager;
 
 public class CreateHumanPlayerOption extends ConfigTurnOption{
 
-    public CreateHumanPlayerOption(Turn turn) {
-        super(MessageManager.getInstance().getMessage("HUMAN"), turn);
+    public CreateHumanPlayerOption(Logic logic) {
+        super(MessageManager.getInstance().getMessage("HUMAN"), logic);
     }
 
     @Override
     public void interact() {
-        this.turn.addPlayer(new HumanPlayer(this.turn.getBoard()));
+        this.logic.addPlayer(new HumanPlayer(this.logic.getBoard()));
     }
 }

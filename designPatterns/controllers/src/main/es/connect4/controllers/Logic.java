@@ -1,5 +1,6 @@
 package main.es.connect4.controllers;
 
+import main.es.connect4.models.Board;
 import main.es.connect4.models.Game;
 import main.es.connect4.models.Player;
 import main.es.connect4.models.Turn;
@@ -20,6 +21,10 @@ public class Logic {
         this.resumeController = new ResumeController(this.game);
     }
 
+    public Board getBoard() {
+        return this.startController.getBoard();
+    }
+
     public Color getColor(Coordinate coordinate) {
         return this.startController.getColor(coordinate);
     }
@@ -34,10 +39,6 @@ public class Logic {
 
     public int getNumberPlayers() {
         return this.startController.getNumberPlayers();
-    }
-
-    public Turn getTurn() {
-        return this.game.getTurn();
     }
 
     public void resetTurn() {

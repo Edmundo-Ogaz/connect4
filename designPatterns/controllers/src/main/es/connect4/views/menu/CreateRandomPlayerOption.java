@@ -1,17 +1,17 @@
 package main.es.connect4.views.menu;
 
+import main.es.connect4.controllers.Logic;
 import main.es.connect4.models.RandomPlayer;
-import main.es.connect4.models.Turn;
 import main.es.connect4.views.MessageManager;
 
 public class CreateRandomPlayerOption extends ConfigTurnOption {
 
-    public CreateRandomPlayerOption(Turn turn) {
-        super(MessageManager.getInstance().getMessage("RANDOM"), turn);
+    public CreateRandomPlayerOption(Logic logic) {
+        super(MessageManager.getInstance().getMessage("RANDOM"), logic);
     }
 
     @Override
     public void interact() {
-        this.turn.addPlayer(new RandomPlayer(this.turn.getBoard()));
+        this.logic.addPlayer(new RandomPlayer(this.logic.getBoard()));
     }
 }

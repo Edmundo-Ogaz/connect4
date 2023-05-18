@@ -1,8 +1,6 @@
 package main.es.connect4.views.menu;
 
-import main.es.connect4.controllers.Controller;
 import main.es.connect4.controllers.Logic;
-import main.es.connect4.models.Turn;
 import main.es.connect4.types.Color;
 import main.es.connect4.views.ColorView;
 import main.es.connect4.views.MessageManager;

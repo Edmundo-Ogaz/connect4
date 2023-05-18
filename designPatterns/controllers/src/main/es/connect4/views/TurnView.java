@@ -4,9 +4,9 @@ import main.es.connect4.controllers.Logic;
 import main.es.connect4.views.menu.ConfigTurnMenu;
 
 public class TurnView {
-    private PlayerViewPrototype playerViewPrototype;
 
     private Logic logic;
+    private PlayerViewPrototype playerViewPrototype;
 
     public TurnView(Logic logic) {
         this.logic = logic;

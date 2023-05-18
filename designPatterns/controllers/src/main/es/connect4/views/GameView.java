@@ -1,6 +1,7 @@
 package main.es.connect4.views;
 
 import main.es.connect4.controllers.Logic;
+import main.es.connect4.views.menu.LanguageMenu;
 
 public class GameView {
 
@@ -12,6 +13,10 @@ public class GameView {
         this.startView = new StartView(logic);
         this.playView = new PlayView(logic);
         this.resumeView = new ResumeView(logic);
+    }
+
+    public void init() {
+        new LanguageMenu("SELECT LANGUAGE:").interact();
     }
 
     public void start() {

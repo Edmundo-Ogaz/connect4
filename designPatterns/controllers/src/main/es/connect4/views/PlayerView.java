@@ -19,5 +19,4 @@ public abstract class PlayerView {
     public void setPlayer(Player player) {
         this.player = player;
     }
-
 }

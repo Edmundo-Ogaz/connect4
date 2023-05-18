@@ -25,23 +25,27 @@ public class MessageManager {
         return MessageManager.instance;
     }
 
-    public void setLanguage(Language language) throws FileNotFoundException, IOException {
+    public void setLanguage(Language language) {
         this.language = language;
         this.readFile();
     }
 
-    private void readFile() throws FileNotFoundException, IOException {
-        //String path = "tech-java-orientadoObjetos/src/main/es/labturing/connect4/resources/";
-        String path = "src/main/es/connect4/resources/";
-        BufferedReader input = new BufferedReader(new FileReader(path+this.language.getFileName()));
-        String line;
-        while ((line = input.readLine()) != null) {
-            String[] separated = line.split("=");
-            separated[0] = separated[0].trim();
-            separated[1] = separated[1].trim().replace("\"", "");
-            this.messages.put(separated[0], separated[1]);
+    private void readFile() {
+        try {
+            //String path = "tech-java-orientadoObjetos/src/main/es/labturing/connect4/resources/";
+            String path = "src/main/es/connect4/resources/";
+            BufferedReader input = new BufferedReader(new FileReader(path+this.language.getFileName()));
+            String line;
+            while ((line = input.readLine()) != null) {
+                String[] separated = line.split("=");
+                separated[0] = separated[0].trim();
+                separated[1] = separated[1].trim().replace("\"", "");
+                this.messages.put(separated[0], separated[1]);
+            }
+            input.close();
+        } catch ( IOException e ) {
+            e.printStackTrace();
         }
-        input.close();
     }
 
     public String getMessage(String key) {

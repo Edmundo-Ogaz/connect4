@@ -9,10 +9,6 @@ public class SpanishOption extends LanguageOption {
     }
 
     public void interact() {
-        try {
-            this.messageManager.setLanguage(Language.SPANISH);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.messageManager.setLanguage(Language.SPANISH);
     }
 }

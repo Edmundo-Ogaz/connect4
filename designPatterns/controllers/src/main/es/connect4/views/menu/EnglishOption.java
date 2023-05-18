@@ -9,10 +9,6 @@ public class EnglishOption extends LanguageOption {
     }
 
     public void interact() {
-        try {
-            this.messageManager.setLanguage(Language.ENGLISH);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.messageManager.setLanguage(Language.ENGLISH);
     }
 }

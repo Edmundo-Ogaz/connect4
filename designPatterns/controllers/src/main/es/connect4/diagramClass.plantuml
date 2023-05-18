@@ -1,15 +1,11 @@
 @startuml connect4
-    Connect4 : - Connect4()
-    Connect4 : - void play()
-    Connect4 : + {static} void main(args)
 
-package model {
-    Game *-> Board
-    Game *-> Turn
+package models {
+    Game *--> Board
+    Game *--> Turn
     Game : + void reset()
     Game : + Board getBoard()
     Game : + Turn getTurn()
-    Game <--* Connect4
 
     Turn o--> Player
     Turn *--> Board
@@ -74,7 +70,55 @@ package model {
     Board : + void setLastDrop(lastDrop)
 }
 
-package menu {
+package controllers {
+    class Logic {
+        + Logic(game)
+        + Board getBoard()
+        + Color getColor(coordinate)
+        + boolean isGameFinished(
+        + boolean isWinner()
+        + int getNumberPlayers()
+        + void resetTurn()
+        + void resetGame()
+        + Player getActivePlayer()
+        + void  play(column)
+        + void addPlayer(player)
+    }
+    Logic *--> StartController
+    Logic *--> PlayController
+    Logic *--> ResumeController
+
+    abstract class Controller {
+        # Game game;
+        Controller(game)
+    }
+    Controller ..> Game
+
+    class StartController extends Controller {
+        + StartController(game)
+        + Board getBoard()
+        + Color getColor(coordinate)
+        + int getNumberPlayers()
+        + void addPlayer(player)
+        + void resetTurn()
+    }
+
+    class PlayController extends Controller {
+        + PlayController(game)
+        + boolean isGameFinished()
+        + boolean isWinner()
+        + Player getActivePlayer()
+        + void  play(column)
+    }
+
+    class ResumeController extends Controller {
+        + ResumeController(game)
+        + void resetGame()
+    }
+}
+
+package views {
+    package menus {
     abstract class Menu
     Menu : # title
     Menu : # options
@@ -104,12 +148,14 @@ package menu {
     IterativeMenu : + void interact()
     IterativeMenu <|-- ConfigTurnMenu
 
-    ConfigTurnMenu *--> Turn
-    ConfigTurnMenu : + ConfigTurnMenu(turn)
-    ConfigTurnMenu : # void addOptions()
-    ConfigTurnMenu : # void showTitle()
-    ConfigTurnMenu : # void execChoosedOption()
-    ConfigTurnMenu : + void interact()
+    class ConfigTurnMenu extends IterativeMenu {
+        + ConfigTurnMenu(logic)
+        # void addOptions()
+        # void showTitle()
+        # void execChoosedOption()
+        + void interact()
+    }
+    ConfigTurnMenu *--> Logic
     ConfigTurnMenu ..> CreateHumanPlayerOption
     ConfigTurnMenu ..> CreateRandomPlayerOption
     ConfigTurnMenu ..> CreateAIPlayerOption
@@ -143,61 +189,114 @@ package menu {
     CreateAIPlayerOption --|> ConfigTurnOption
     CreateAIPlayerOption : + void interact()
 
-    ConfigTurnOption --|> Option
-    ConfigTurnOption *--> Turn
-    ConfigTurnOption : + ConfigTurnOption(title, turn)
+    abstract class ConfigTurnOption extends Option {
+        + ConfigTurnOption(title, logic)
+    }
+    ConfigTurnOption *--> Logic 
 }
-
-package view {
-    GameView *-> BoardView
-    GameView *-> TurnView
-    GameView *-> Game
-    GameView : + void start()
-    GameView : + void play()
-    GameView : + boolean resume()
-    GameView ..> YesNoDialog
+    class GameView {
+        + GameView(logic)
+        + void init()
+        + void start()
+        + void play()
+        + boolean resume()
+    }
+    GameView *--> StartView
+    GameView *--> PlayView
+    GameView *--> ResumeView
     GameView ..> LanguageMenu
-    GameView <--* Connect4
 
-    TurnView *--> Turn
-    TurnView --> PlayerView
+    class StartView {
+        StartView(logic)
+        void interact()
+    }
+    StartView *--> Logic
+    StartView ..> TurnView
+    StartView ..> BoardView
+    StartView ..> MessageManager
+
+    class PlayView {
+        PlayView(logic)
+        void interact()
+    }
+    PlayView *--> Logic
+    PlayView ..> TurnView
+    PlayView ..> BoardView
+
+    class ResumeView {
+        - Logic logic
+        ResumeView(logic)
+        + boolean interact()
+    }
+    ResumeView *--> Logic
+    ResumeView ..> YesNoDialog
+
+    class TurnView {
+        + TurnView(logic)
+        + void configTurn()
+        + void play()
+        + void writeResult()
+    }
+    TurnView *--> Logic
     TurnView *--> PlayerViewPrototype
-    TurnView : + void configTurn()
-    TurnView : + void play()
-    TurnView : + void writeResult()
     TurnView ..> ConfigTurnMenu
+    TurnView ..> PlayerView
+    TurnView ..> MessageManager
 
-    abstract class PlayerView
+    abstract class PlayerView {
+        # Player player
+        # void showWinner()
+        # void showPlayerTurn()
+        + {abstract} int getColumn();
+        + void setPlayer(player)
+    }
     PlayerView --> Player
-    PlayerView : # void showWinner()
-    PlayerView : # void showPlayerTurn()
-    PlayerView : # {abstract} int getColumn()
-    PlayerView : + void setPlayer(player)
-    PlayerView <|-- HumanPlayerView
-    PlayerView <|-- MachinePlayerView
+    PlayerView ..> MessageManager
 
-    HumanPlayerView : + int getColumn()
+    class HumanPlayerView extends PlayerView {
+        + int getColumn()
+    }
+    HumanPlayerView ..> ClosedIntervalDialog
+    HumanPlayerView ..> MessageManager
 
-    abstract class MachinePlayerView
-    MachinePlayerView : + int getColumn()
-    MachinePlayerView : + {abstract} void showColumnSelected(column)
-    MachinePlayerView <|-- RandomPlayerView
-    MachinePlayerView <|-- MinMaxPlayerView
+    abstract class MachinePlayerView extends PlayerView {
+        + int getColumn()
+        # {abstract} void showColumnSelected(column) 
+    }
 
-    MinMaxPlayerView : + void showColumnSelected(column)
+    class MinMaxPlayerView extends MachinePlayerView {
+        + void showColumnSelected(column)
+    }
+    MinMaxPlayerView ..> MessageManager
 
-    RandomPlayerView : + void showColumnSelected(column)
+    class RandomPlayerView extends MachinePlayerView {
+    + void showColumnSelected(column)
+    }
+    RandomPlayerView ..> MessageManager
 
-    PlayerViewPrototype : - playerViewMap
-    PlayerViewPrototype : PlayerView createView(activePlayer)
+    class PlayerViewPrototype {
+        - HashMap<PlayerType, PlayerView> playerViewMap
+        PlayerViewPrototype()
+        PlayerView createView(activePlayer)
+    }
     PlayerViewPrototype ..> HumanPlayerView
     PlayerViewPrototype ..> RandomPlayerView
     PlayerViewPrototype ..> MinMaxPlayerView
     PlayerViewPrototype ..> PlayerType
 
-    BoardView : {static} int BLANK_SPACES
-    BoardView *--> Board
-    BoardView : + void writeln()
-    BoardView : + boolean isGameFinished()
+    class BoardView {
+    static final int BLANK_SPACES
+    + BoardView(logic)
+    + void writeln()
+    }
+    BoardView *--> Logic
+    BoardView ..> Coordinate
+    BoardView ..> MessageManager
+    BoardView ..> ColorView
 }
+
+Connect4 : - Connect4()
+Connect4 : - void play()
+Connect4 : + {static} void main(args)
+Connect4 *--> GameView
 @enduml

@@ -19,5 +19,4 @@ public class ResumeView {
         }
         return yesNoDialog.isAffirmative();
     }
-
 }

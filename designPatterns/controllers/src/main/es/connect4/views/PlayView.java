@@ -19,5 +19,4 @@ class PlayView {
         } while (!this.logic.isGameFinished());
         turnView.writeResult();
     }
-
 }

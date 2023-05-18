@@ -12,7 +12,6 @@ public class StartController extends Controller {
 
     public StartController(Game game) {
         super(game);
-        new LanguageMenu("SELECT LANGUAGE:").interact();
     }
 
     public Board getBoard() {

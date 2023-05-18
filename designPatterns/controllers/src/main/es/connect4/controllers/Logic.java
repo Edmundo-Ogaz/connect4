@@ -3,22 +3,19 @@ package main.es.connect4.controllers;
 import main.es.connect4.models.Board;
 import main.es.connect4.models.Game;
 import main.es.connect4.models.Player;
-import main.es.connect4.models.Turn;
 import main.es.connect4.types.Color;
 import main.es.connect4.types.Coordinate;
 
 public class Logic {
 
-    protected Game game;
     private StartController startController;
     private PlayController playController;
     private ResumeController resumeController;
 
     public Logic(Game game) {
-        this.game = game;
-        this.startController = new StartController(this.game);
-        this.playController = new PlayController(this.game);
-        this.resumeController = new ResumeController(this.game);
+        this.startController = new StartController(game);
+        this.playController = new PlayController(game);
+        this.resumeController = new ResumeController(game);
     }
 
     public Board getBoard() {

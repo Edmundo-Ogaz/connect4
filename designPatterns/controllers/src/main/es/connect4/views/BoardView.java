@@ -1,13 +1,11 @@
 package main.es.connect4.views;
 
-import main.es.connect4.models.Board;
 import main.es.connect4.types.Coordinate;
-import main.es.connect4.controllers.Controller;
 import main.es.connect4.controllers.Logic;
 
 public class BoardView {
     
-    static int BLANK_SPACES = 4;
+    static final int BLANK_SPACES = 4;
     private Logic logic;
 
     public BoardView(Logic logic) {

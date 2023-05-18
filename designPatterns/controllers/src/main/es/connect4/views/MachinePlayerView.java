@@ -11,5 +11,4 @@ public abstract class MachinePlayerView extends PlayerView {
     }
 
     protected abstract void showColumnSelected(int column);
-    
 }

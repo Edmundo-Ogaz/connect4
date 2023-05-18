@@ -15,17 +15,7 @@ public class ResumeController extends Controller {
         super(game);
     }
 
-    public boolean interact(TurnView turnView) {
-        YesNoDialog yesNoDialog = new YesNoDialog();
-        yesNoDialog.read(MessageManager.getInstance().getMessage("RESUME"));
-        if (yesNoDialog.isAffirmative()) {
-            this.game.reset();
-        }
-        return yesNoDialog.isAffirmative();
-    }
-
     public void resetGame() {
         this.game.reset();
     }
-
 }

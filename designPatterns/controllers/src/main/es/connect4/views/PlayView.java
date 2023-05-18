@@ -16,7 +16,7 @@ class PlayView {
         do {
             turnView.play();
             boardView.writeln();
-        } while (!boardView.isGameFinished());
+        } while (!this.logic.isGameFinished());
         turnView.writeResult();
     }
 

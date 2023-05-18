@@ -24,4 +24,8 @@ public class ResumeController extends Controller {
         return yesNoDialog.isAffirmative();
     }
 
+    public void resetGame() {
+        this.game.reset();
+    }
+
 }

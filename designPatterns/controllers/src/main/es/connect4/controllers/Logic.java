@@ -20,43 +20,43 @@ public class Logic {
         this.resumeController = new ResumeController(this.game);
     }
 
-    public Game getGame() {
-        return this.game;
-    }
-
     public Color getColor(Coordinate coordinate) {
-        return this.game.getBoard().getColor(coordinate);
+        return this.startController.getColor(coordinate);
     }
 
     public boolean isGameFinished() {
-        return this.game.getBoard().isGameFinished();
+        return this.playController.isGameFinished();
     }
 
     public boolean isWinner() {
-        return this.game.getBoard().isWinner();
+        return this.playController.isWinner();
     }
 
     public int getNumberPlayers() {
-        return this.game.getTurn().getNumberPlayers();
+        return this.startController.getNumberPlayers();
     }
 
     public Turn getTurn() {
         return this.game.getTurn();
     }
 
-    public void reset() {
-        this.game.getTurn().reset();
+    public void resetTurn() {
+        this.startController.resetTurn();
     }
 
     public void resetGame() {
-        this.game.reset();
+        this.resumeController.resetGame();
     }
 
     public Player getActivePlayer() {
-        return this.game.getTurn().getActivePlayer();
+        return this.playController.getActivePlayer();
     }
 
     public void  play(int column) {
-        this.game.getTurn().play(column);
+        this.playController.play(column);
+    }
+
+    public void addPlayer(Player player) {
+        this.startController.addPlayer(player);
     }
 }

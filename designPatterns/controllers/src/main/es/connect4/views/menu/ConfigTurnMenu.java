@@ -47,7 +47,7 @@ public class ConfigTurnMenu extends IterativeMenu {
 
     public void interact() {
         super.interact();
-        this.logic.reset();
+        this.logic.resetTurn();
     }
 
 }

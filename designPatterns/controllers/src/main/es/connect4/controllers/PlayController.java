@@ -1,13 +1,7 @@
 package main.es.connect4.controllers;
 
 import main.es.connect4.models.Game;
-import main.es.connect4.types.Color;
-import main.es.connect4.types.Coordinate;
-
-import main.es.connect4.views.TurnView;
-import main.es.connect4.views.BoardView;
-
-//import main.es.connect4.types.Error;
+import main.es.connect4.models.Player;
 
 public class PlayController extends Controller {
 
@@ -15,51 +9,19 @@ public class PlayController extends Controller {
         super(game);
     }
 
-    public void interact(TurnView turnView, BoardView boardView) {
-        do {
-            turnView.play();
-            boardView.writeln();
-        } while (!boardView.isGameFinished());
-        turnView.writeResult();
+    public boolean isGameFinished() {
+        return this.game.isGameFinished();
     }
 
-    /*public boolean areAllTokensOnBoard() {
-        return this.game.areAllTokensOnBoard();
+    public boolean isWinner() {
+        return this.game.isWinner();
     }
 
-    public boolean isTicTacToe() {
-        return this.game.isTicTacToe();
+    public Player getActivePlayer() {
+        return this.game.getActivePlayer();
     }
 
-    public void next() {
-        this.game.next();
+    public void  play(int column) {
+        this.game.play(column);
     }
-
-    public Color getActiveColor() {
-        return this.game.getActiveColor();
-    }
-
-    public void putToken(Coordinate coordinate) {
-        this.game.putToken(new Coordinate(coordinate.getRow(), coordinate.getColumn()));
-    }
-
-    public Error getPutTokenError(Coordinate coordinate) {
-        return this.game.getPutTokenError(coordinate);
-    }
-
-    public void moveToken(Coordinate origin, Coordinate target) {
-        this.game.moveToken(
-                new Coordinate(origin.getRow(), origin.getColumn()),
-                new Coordinate(target.getRow(), target.getColumn())
-        );
-    }
-
-    public Error getOriginMoveTokenError(Coordinate coordinate) {
-        return this.game.getOriginMoveTokenError(coordinate);
-    }
-
-    public Error getTargetMoveTokenError(Coordinate origin, Coordinate target) {
-        return this.game.getTargetMoveTokenError(origin, target);
-    }*/
-
 }

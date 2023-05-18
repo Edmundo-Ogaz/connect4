@@ -34,9 +34,4 @@ public class BoardView {
         }
         MessageManager.getInstance().writeln("HORIZONTAL_LINE_SYMBOL");
     }
-
-    public boolean isGameFinished() {
-        return this.logic.isGameFinished();
-    }
-
 }
